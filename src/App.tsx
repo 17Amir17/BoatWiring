@@ -62,27 +62,27 @@ export default function App() {
       <ScenarioPanel />
       <div className="flex items-center gap-2 px-4 h-9 bg-panel-bg border-b border-panel-border text-xs">
         <button
-          className="px-2 py-0.5 rounded bg-panel-hover hover:bg-slate-700/40"
+          className="px-2 py-0.5 rounded bg-slate-100 hover:bg-slate-200"
           onClick={() => setEditorOpen({ defId: undefined })}
         >+ new component</button>
         {selectedDefId && (
           <>
             <button
-              className="px-2 py-0.5 rounded bg-panel-hover hover:bg-slate-700/40"
+              className="px-2 py-0.5 rounded bg-slate-100 hover:bg-slate-200"
               onClick={() => setEditorOpen({ defId: selectedDefId })}
             >edit def</button>
             <button
-              className="px-2 py-0.5 rounded bg-panel-hover hover:bg-slate-700/40"
+              className="px-2 py-0.5 rounded bg-slate-100 hover:bg-slate-200"
               onClick={() => setSandboxOpen(selectedDefId)}
             >sandbox</button>
             <button
-              className="px-2 py-0.5 rounded bg-yellow-700/40 hover:bg-yellow-700/60 text-yellow-100"
+              className="px-2 py-0.5 rounded bg-yellow-200 hover:bg-yellow-300 text-yellow-900"
               onClick={() => openViewer(selectedDefId)}
             >view (large)</button>
           </>
         )}
         <button
-          className="ml-auto px-2 py-0.5 rounded bg-panel-hover hover:bg-slate-700/40"
+          className="ml-auto px-2 py-0.5 rounded bg-slate-100 hover:bg-slate-200"
           onClick={() => setShowBom((v) => !v)}
         >{showBom ? 'hide BOM' : 'show BOM'}</button>
       </div>

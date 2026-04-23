@@ -13,7 +13,29 @@
     "ratedA": 200,
     "intermittentA": 300,
     "peakA": 600,
-    "ratedV": 24
+    "ratedV": 24,
+    "voltageRangeV": "12-24 (advertised 12-48)",
+    "positions": ["OFF", "1 (BAT1)", "2 (BAT2)", "1+2 (BOTH)"],
+    "studSize": "M10",
+    "terminalCount": 3,
+    "knobRemovable": true,
+    "ignitionProtected": false,
+    "ipRating": "not specified (not ignition-protected)",
+    "bodyMaterial": "ABS plastic housing, copper terminals",
+    "knobMaterial": "ABS",
+    "mountingType": "Surface mount, 4 corner screw holes through flange",
+    "dimensionsMm": { "w": 75, "d": 75, "h": 100 },
+    "weightG": 270,
+    "formFactor": "Square base / rotary disconnect",
+    "_raw_high_concerned_chemical": "None",
+    "_raw_item_diameter": "7.5cm",
+    "_raw_item_weight": "270g",
+    "_raw_item_height": "10cm",
+    "_raw_item_width": "7.5cm",
+    "_raw_item_length": "7.5cm",
+    "_raw_material": "aluminum (per listing; appears to be plastic/ABS in photos)",
+    "_raw_origin": "Mainland China",
+    "_raw_sku_color": "M10 12V 24V 200A"
   },
   "selector": {
     "defaultPosition": 0,
@@ -24,6 +46,21 @@
       { "label": "BOTH", "conduct": [["in1", "out"], ["in2", "out"], ["in1", "in2"]] }
     ]
   },
+  "description": "Marine/automotive battery disconnect / dual-battery selector switch. Rotary 4-position knob (OFF / 1 / 2 / 1+2 BOTH) for switching between two battery banks. Continuous 200A, intermittent 300A, peak/cranking 600A; rated 12-24V (advertised up to 48V). M10 copper studs on the back. Square ABS housing with four corner mounting holes; removable red key knob for theft prevention. The '3-position with wire' variant ships with copper ring lugs and rubber boot covers.",
+  "packageContents": [
+    "1 x Battery disconnect switch (3-position, dual-battery)",
+    "3 x Copper ring terminal lugs (marked 2x6/16)",
+    "4 x Rubber stud / boot covers",
+    "Mounting screws (per listing photo)"
+  ],
+  "gallery": [
+    "https://ae-pic-a1.aliexpress-media.com/kf/Sa976459fb7724bf1bca6e153a425a8ebg.png",
+    "https://ae-pic-a1.aliexpress-media.com/kf/See3545d5c8384e4c8b8fcbd9510d9f99q.png",
+    "https://ae-pic-a1.aliexpress-media.com/kf/Sb7f6dd6f36ab431db1c9c1904ba9791eP.png",
+    "https://ae-pic-a1.aliexpress-media.com/kf/Sf3272e722c5a4b2bbffd17cb1958eaaaH.png",
+    "https://ae-pic-a1.aliexpress-media.com/kf/S136cdd91e1b740c898a1fc931f5176ada.png",
+    "https://ae-pic-a1.aliexpress-media.com/kf/S0826753e7117452b86e370476ec76f06Q.jpg"
+  ],
   "qtyOwned": 1,
   "source": {
     "platform": "aliexpress",

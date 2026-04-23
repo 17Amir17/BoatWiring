@@ -18,6 +18,7 @@ import type {
 } from '../types';
 import { loadComponentDefs, loadWireDefs } from '../lib/components/registry';
 import { initialState, step, type EngineState } from '../lib/sim/engine';
+import { expectedCurrentBetween, pickWireForCurrent } from '../lib/wires/pickWire';
 
 export type BoatNode = RFNode<ComponentNodeData>;
 export type BoatEdge = RFEdge<WireData>;
@@ -48,6 +49,7 @@ interface AppState {
   injectFault: (target: { kind: 'node' | 'edge'; id: string }, fault: Fault) => void;
   clearFaults: (target: { kind: 'node' | 'edge'; id: string }) => void;
   setDefaultWire: (id: string, lengthFt?: number) => void;
+  setEdgeWire: (edgeId: string, wireDefId: string) => void;
   setSelection: (sel: { nodeIds: string[]; edgeIds: string[] }) => void;
 
   // Sim control
@@ -90,10 +92,18 @@ export const useAppStore = create<AppState>((set, get) => {
       set((s) => ({ edges: applyEdgeChanges(changes, s.edges) as BoatEdge[] })),
     onConnect: (conn) =>
       set((s) => {
-        const def = s.wireDefs.get(s.defaultWireDefId);
+        // Smart pick: size the wire to the heavier-loaded endpoint, fall back to
+        // the user's last-chosen default if neither side constrains it.
+        const sourceNode = conn.source ? s.nodes.find((n) => n.id === conn.source) : undefined;
+        const targetNode = conn.target ? s.nodes.find((n) => n.id === conn.target) : undefined;
+        const sourceDef = sourceNode ? s.componentDefs.get(sourceNode.data.defId) : undefined;
+        const targetDef = targetNode ? s.componentDefs.get(targetNode.data.defId) : undefined;
+        const targetA = expectedCurrentBetween(sourceDef, targetDef);
+        const wireDefId = pickWireForCurrent(s.wireDefs, targetA, s.defaultWireDefId);
+        const def = s.wireDefs.get(wireDefId);
         if (!def) return {};
         const data: WireData = {
-          wireDefId: s.defaultWireDefId,
+          wireDefId,
           lengthFt: s.defaultWireLengthFt,
         };
         const newEdges = addEdge(
@@ -204,6 +214,23 @@ export const useAppStore = create<AppState>((set, get) => {
         defaultWireDefId: id,
         defaultWireLengthFt: lengthFt ?? s.defaultWireLengthFt,
       })),
+
+    setEdgeWire: (edgeId, wireDefId) =>
+      set((s) => {
+        const def = s.wireDefs.get(wireDefId);
+        if (!def) return {};
+        return {
+          edges: s.edges.map((e) =>
+            e.id === edgeId
+              ? {
+                  ...e,
+                  data: { ...e.data!, wireDefId },
+                  style: { ...e.style, stroke: def.insulationColor, strokeWidth: gaugeStrokeWidth(def.gaugeAWG) },
+                }
+              : e,
+          ),
+        };
+      }),
 
     setSelection: (sel) => set({ selection: sel }),
 

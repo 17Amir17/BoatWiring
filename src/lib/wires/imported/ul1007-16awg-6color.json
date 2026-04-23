@@ -4,6 +4,42 @@
   "gaugeAWG": 16,
   "maxAmps": 22,
   "insulationColor": "#fbbf24",
+  "description": "6-color hookup wire kit: UL1007 PVC-insulated, stranded tinned copper, 16 AWG. Six 5-meter spools (red, black, yellow, blue, green, white) for a total of 30 m. UL1007 is rated 300V / 80°C with VW-1 flame retardance — suitable for low-voltage 12V/24V DC accessory wiring on boats, panels, and signal runs. Tinned conductor improves corrosion resistance in marine environments.",
+  "specs": {
+    "standard": "UL1007",
+    "ratingVoltageV": 300,
+    "ratingTemperatureC": 80,
+    "flameRating": "VW-1",
+    "conductorMaterial": "Tinned copper, stranded",
+    "gaugeAWG": 16,
+    "conductorAreaMm2": 1.31,
+    "strands": "26 × 0.16 mm (typical for UL1007 16 AWG)",
+    "insulationMaterial": "PVC",
+    "insulationThicknessMm": 0.4,
+    "outerDiameterMm": 2.4,
+    "ampacityChassisA": 22,
+    "lengthPerSpoolM": 5,
+    "spoolCount": 6,
+    "totalLengthM": 30,
+    "colorsIncluded": ["red", "black", "yellow", "blue", "green", "white"],
+    "_raw_voltage": "≤80V",
+    "_raw_structure": "Without modular telephone connectors",
+    "_raw_use": "Not Telecommunication",
+    "_raw_high_concerned_chemical": "None",
+    "_raw_origin": "Mainland China"
+  },
+  "packageContents": [
+    "1 × Red 16 AWG UL1007 spool, 5 m",
+    "1 × Black 16 AWG UL1007 spool, 5 m",
+    "1 × Yellow 16 AWG UL1007 spool, 5 m",
+    "1 × Blue 16 AWG UL1007 spool, 5 m",
+    "1 × Green 16 AWG UL1007 spool, 5 m",
+    "1 × White 16 AWG UL1007 spool, 5 m",
+    "1 × Printed retail box (\"TINNED COPPER WIRE — 6 REEL PACKED\")"
+  ],
+  "gallery": [
+    "/components/ul1007-16awg-6color/main.jpg"
+  ],
   "source": {
     "platform": "aliexpress",
     "url": "https://www.aliexpress.com/item/1005007670999760.html",
@@ -11,6 +47,8 @@
     "seller": "Beteno Connect Store",
     "priceUSD": 23.0,
     "images": ["/components/ul1007-16awg-6color/main.jpg"],
-    "fetchedAt": "2026-04-23T11:00:00.000Z"
+    "fetchedAt": "2026-04-23T11:00:00.000Z",
+    "auditedAt": "2026-04-23T00:00:00.000Z",
+    "auditNotes": "Original AliExpress listing 1005007670999760 was delisted/redirected to a different (silicone) wire kit at audit time. Specs reconstructed from: (a) cached seller title confirming UL1007 PVC 16 AWG 6×5 m, (b) product photo showing 6 spool colors (red/black/yellow/blue/green/white), (c) AliExpress category spec rows still served (≤80V marking, Mainland China origin), and (d) the universal UL1007 industry standard (UL Subject 758 — 300V / 80°C / VW-1, 26×0.16 mm tinned copper for 16 AWG, ~1.31 mm² conductor area)."
   }
 }

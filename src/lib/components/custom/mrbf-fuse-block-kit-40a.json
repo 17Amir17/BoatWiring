@@ -10,12 +10,41 @@
   ],
   "specs": {
     "ratingA": 40,
+    "holderMaxA": 300,
     "voltageRating": 58,
-    "studDiameterIn": 0.3125
+    "voltageNote": "58V DC max",
+    "studDiameterIn": 0.3125,
+    "studSize": "5/16\" (M8)",
+    "fuseFormFactor": "MRBF",
+    "ipRating": "IP66",
+    "material": "Copper",
+    "waterproof": true,
+    "marineRated": true,
+    "safetyStandard": "IEC",
+    "availableFuseRatingsA": [30, 40, 50, 75, 80, 90, 100, 125, 150, 175, 200, 250, 300],
+    "kitConfiguration": "One way + Cover + 40A Fuse",
+    "_raw_eu_lvd_voltage": "Low voltage: Below 50Vac or 75Vdc",
+    "_raw_ean_code": "6936983800013",
+    "_raw_high_concerned_chemical": "None",
+    "_raw_material": "Copper",
+    "_raw_is_customized": "None",
+    "_raw_safety_standards": "IEC"
   },
+  "description": "TLZWLA marine-rated battery terminal mount MRBF fuse block kit. Copper busbar with M8 / 5/16\" stud bolts directly to battery positive post; MRBF cartridge fuse (40A) clamps under a second M8 stud that becomes the OUT terminal. Includes a red silicone insulating boot to cover the live stud. Rated 58V DC, IP66 waterproof, IEC compliant. Holder body accepts MRBF fuses from 30A through 300A.",
+  "packageContents": [
+    "1x MRBF terminal fuse holder (busbar + stud)",
+    "1x 40A MRBF cartridge fuse",
+    "1x red silicone protective cover/boot",
+    "Mounting hardware (nuts/washers)"
+  ],
+  "gallery": [
+    "https://ae01.alicdn.com/kf/Scd1d16c66fd2440bac44c67afa17bd0ef.jpg",
+    "https://ae-pic-a1.aliexpress-media.com/kf/Sa976459fb7724bf1bca6e153a425a8ebg.png"
+  ],
   "subComponents": [
-    { "id": "f", "subKind": "fuse", "specs": { "ratingA": 40, "formFactor": "MRBF" }, "label": "40A MRBF" },
-    { "id": "stud", "subKind": "busbar", "specs": {}, "label": "Battery stud" }
+    { "id": "stud", "subKind": "busbar", "specs": { "studSize": "5/16\" (M8)" }, "label": "Battery stud (BAT+ post mount)" },
+    { "id": "f", "subKind": "fuse", "specs": { "ratingA": 40, "formFactor": "MRBF", "voltageRating": 58 }, "label": "40A MRBF" },
+    { "id": "cover", "subKind": "cover", "specs": { "color": "red", "material": "silicone" }, "label": "Insulating cover" }
   ],
   "internalWiring": [
     { "a": { "external": "batstud" }, "b": { "subId": "stud", "portId": "+" } },

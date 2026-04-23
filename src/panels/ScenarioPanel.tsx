@@ -42,14 +42,14 @@ export default function ScenarioPanel() {
     <div className="flex items-center gap-3 px-4 h-9 bg-panel-bg border-b border-panel-border text-xs">
       <button
         className={`px-3 py-0.5 rounded ${
-          running ? 'bg-red-700/60 hover:bg-red-700/80' : 'bg-emerald-700/60 hover:bg-emerald-700/80'
+          running ? 'bg-red-600 hover:bg-red-700 text-white' : 'bg-emerald-600 hover:bg-emerald-700 text-white'
         }`}
         onClick={() => (running ? stopSim() : startSim())}
       >
         {running ? '■ stop' : '▶ run'}
       </button>
       <button
-        className="px-2 py-0.5 rounded bg-panel-hover hover:bg-slate-700/40"
+        className="px-2 py-0.5 rounded bg-slate-100 hover:bg-slate-200"
         onClick={resetSim}
       >
         ⟲ reset
@@ -60,7 +60,7 @@ export default function ScenarioPanel() {
           <button
             key={n}
             className={`px-2 py-0.5 rounded text-[11px] ${
-              timeScale === n ? 'bg-yellow-600/40 text-yellow-100' : 'bg-panel-hover hover:bg-slate-700/40'
+              timeScale === n ? 'bg-yellow-200 text-yellow-900' : 'bg-slate-100 hover:bg-slate-200'
             }`}
             onClick={() => setTimeScale(n)}
           >
@@ -74,7 +74,7 @@ export default function ScenarioPanel() {
           <button
             key={s.id}
             title={s.description}
-            className="px-2 py-0.5 rounded bg-panel-hover hover:bg-slate-700/40 text-[11px]"
+            className="px-2 py-0.5 rounded bg-slate-100 hover:bg-slate-200 text-[11px]"
             onClick={() => runScenario(s.id)}
           >
             {s.name}
@@ -86,7 +86,7 @@ export default function ScenarioPanel() {
           {results.map((r, i) => (
             <span
               key={i}
-              className={r.pass ? 'text-emerald-400' : 'text-red-400'}
+              className={r.pass ? 'text-emerald-600' : 'text-red-600'}
               title={r.msg}
             >
               {r.pass ? '✓' : '✗'} {r.label}

@@ -48,7 +48,7 @@ export default function ComponentSandbox({ defId, onClose }: Props) {
       >
         <div className="flex items-center justify-between px-4 h-10 border-b border-panel-border">
           <div className="text-sm font-semibold">Sandbox: {def.name}</div>
-          <button className="text-slate-400 hover:text-slate-200" onClick={onClose}>✕</button>
+          <button className="text-slate-600 hover:text-slate-800" onClick={onClose}>✕</button>
         </div>
         <div className="flex flex-1 min-h-0">
           <div className="w-1/2 p-3 overflow-auto border-r border-panel-border text-xs">
@@ -72,7 +72,7 @@ export default function ComponentSandbox({ defId, onClose }: Props) {
             )}
             {def.kind === 'selectorSwitch' && def.selector && (
               <select
-                className="bg-panel-hover border border-panel-border rounded px-1 py-0.5 mb-1"
+                className="bg-slate-100 border border-panel-border rounded px-1 py-0.5 mb-1"
                 value={state?.selectedPosition ?? def.selector.defaultPosition}
                 onChange={(e) => setState((s) => ({ ...s, selectedPosition: Number(e.target.value) }))}
               >
@@ -102,7 +102,7 @@ export default function ComponentSandbox({ defId, onClose }: Props) {
               </thead>
               <tbody>
                 {def.ports.map((p) => (
-                  <tr key={p.id} className="text-slate-200">
+                  <tr key={p.id} className="text-slate-800">
                     <td>{p.label}</td>
                     <td className="text-right font-mono">
                       {result?.voltages[p.id] !== undefined ? result.voltages[p.id]!.toFixed(3) : '—'}
@@ -114,11 +114,11 @@ export default function ComponentSandbox({ defId, onClose }: Props) {
                 ))}
               </tbody>
             </table>
-            <div className={`mt-3 text-[10px] ${result?.converged ? 'text-emerald-400' : 'text-red-400'}`}>
+            <div className={`mt-3 text-[10px] ${result?.converged ? 'text-emerald-600' : 'text-red-600'}`}>
               {result?.converged ? 'converged' : 'failed to converge'}
             </div>
             <button
-              className="mt-3 text-[10px] px-2 py-1 rounded bg-panel-hover hover:bg-slate-700/40"
+              className="mt-3 text-[10px] px-2 py-1 rounded bg-slate-100 hover:bg-slate-200"
               onClick={() => copyAsFixture(def, drives, state, subStates)}
             >Copy as JSON fixture</button>
           </div>
@@ -139,9 +139,9 @@ function DriveRow({
 }) {
   return (
     <div className="grid grid-cols-[1fr_2fr_2fr] gap-1 mb-1 items-center">
-      <span className="text-slate-300">{port.label}</span>
+      <span className="text-slate-700">{port.label}</span>
       <select
-        className="bg-panel-hover border border-panel-border rounded px-1 py-0.5"
+        className="bg-slate-100 border border-panel-border rounded px-1 py-0.5"
         value={spec.kind}
         onChange={(e) => {
           const k = e.target.value as DriveSpec['kind'];
@@ -159,17 +159,17 @@ function DriveRow({
         <option value="leak">leak</option>
       </select>
       {spec.kind === 'voltage' && (
-        <input className="bg-panel-hover border border-panel-border rounded px-1 font-mono text-right"
+        <input className="bg-slate-100 border border-panel-border rounded px-1 font-mono text-right"
           type="number" step="0.1" value={spec.v}
           onChange={(e) => onChange({ kind: 'voltage', v: Number(e.target.value) || 0 })} />
       )}
       {spec.kind === 'load' && (
-        <input className="bg-panel-hover border border-panel-border rounded px-1 font-mono text-right"
+        <input className="bg-slate-100 border border-panel-border rounded px-1 font-mono text-right"
           type="number" step="0.5" value={spec.watts}
           onChange={(e) => onChange({ kind: 'load', watts: Number(e.target.value) || 0 })} />
       )}
       {spec.kind === 'leak' && (
-        <input className="bg-panel-hover border border-panel-border rounded px-1 font-mono text-right"
+        <input className="bg-slate-100 border border-panel-border rounded px-1 font-mono text-right"
           type="number" step="1" value={spec.rOhm}
           onChange={(e) => onChange({ kind: 'leak', rOhm: Number(e.target.value) || 1 })} />
       )}

@@ -5,15 +5,15 @@ export default {
     extend: {
       colors: {
         wire: {
-          off: '#3a3f47',
+          off: '#94a3b8',
           low: '#facc15',
           mid: '#f97316',
           high: '#ef4444',
         },
         panel: {
-          bg: '#0f1115',
-          border: '#1f2530',
-          hover: '#1a1e26',
+          bg: '#ffffff',
+          border: '#e2e8f0',
+          hover: '#f1f5f9',
         },
       },
     },

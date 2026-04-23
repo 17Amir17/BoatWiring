@@ -14,8 +14,40 @@
     "vMax": 30,
     "chromaticity": "blue",
     "ip": "IP67",
-    "inrushA": 0.2
+    "inrushA": 0.2,
+    "formFactor": "oval surface-mount transom courtesy light",
+    "bodyMaterial": "stainless-steel-look ABS plastic bezel, polycarbonate blue lens",
+    "ledCount": 4,
+    "ledType": "SMD",
+    "colorWavelengthNm": 465,
+    "beamAngleDeg": 120,
+    "currentA12V": 0.12,
+    "currentA24V": 0.06,
+    "wireLeads": "2x ~150mm pigtail (red +, black -)",
+    "mountingScrewCount": 2,
+    "_raw_high_concerned_chemical": "None",
+    "_raw_brand_name": "SUITU",
+    "_raw_origin": "Mainland China",
+    "_raw_seller_title": "4Pcs Boat Transom Light 10-30V Universal Waterproof Marine Boat Underwater Pontoon Transom Lamp 4 LED Blue Courtesy Lights",
+    "_raw_voltage_range": "10-30V DC",
+    "_raw_led_count": "4 LEDs per fixture",
+    "_raw_color": "Blue",
+    "_raw_pack_size": "4 pieces",
+    "_raw_application": "boat transom / pontoon / underwater accent / courtesy"
   },
+  "description": "Universal 10-30V marine LED courtesy light, sold in a 4-pack. Each fixture has a chrome-finish ABS oval bezel with a blue polycarbonate lens housing 4 SMD LEDs, intended for transom, pontoon, side-marker or underwater accent use. IP67 waterproof. Two short pigtail leads (red +, black -) exit the back for wiring; pack includes 8 self-tapping screws (2 per fixture).",
+  "packageContents": [
+    "4 x blue LED courtesy light fixtures",
+    "8 x stainless self-tapping mounting screws (2 per fixture)"
+  ],
+  "gallery": [
+    "https://ae01.alicdn.com/kf/S579b011dba6e41f59eb02d9f44b5eaees.jpeg",
+    "https://ae01.alicdn.com/kf/Sa5102b2ae4fe49b588d5b64de7047c919.jpeg",
+    "https://ae01.alicdn.com/kf/S3bdb452f545b4929901707c940e90bf2D.jpeg",
+    "https://ae01.alicdn.com/kf/S2ee8b37945b3427fab2f66f5081fd3e8o.jpeg",
+    "https://ae01.alicdn.com/kf/S19b35eb42dfe437694449d415e8a2080e.jpeg",
+    "https://ae01.alicdn.com/kf/S1ddfd97c9d10441f8c0301fd7c6ecae7C.jpeg"
+  ],
   "source": {
     "platform": "aliexpress",
     "url": "https://www.aliexpress.com/item/1005007205455178.html",

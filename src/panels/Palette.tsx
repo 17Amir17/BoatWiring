@@ -60,15 +60,15 @@ export default function Palette() {
   return (
     <div className="w-64 h-full overflow-y-auto bg-panel-bg border-r border-panel-border p-2 text-sm">
       <input
-        className="w-full bg-panel-hover border border-panel-border rounded px-2 py-1 text-xs mb-2"
+        className="w-full bg-slate-100 border border-panel-border rounded px-2 py-1 text-xs mb-2"
         placeholder="Search components..."
         value={filter}
         onChange={(e) => setFilter(e.target.value)}
       />
       <div className="mb-3">
-        <label className="block text-[10px] text-slate-400 mb-1">Default wire (drag to connect)</label>
+        <label className="block text-[10px] text-slate-600 mb-1">Default wire (drag to connect)</label>
         <select
-          className="w-full bg-panel-hover border border-panel-border rounded px-1 py-1 text-xs"
+          className="w-full bg-slate-100 border border-panel-border rounded px-1 py-1 text-xs"
           value={defaultWireDefId}
           onChange={(e) => setDefaultWire(e.target.value)}
         >
@@ -108,11 +108,11 @@ function PaletteRow({ def }: { def: ComponentDef }) {
         e.dataTransfer.effectAllowed = 'move';
       }}
       title={def.source ? `${def.source.sellerTitle}\n${def.source.url}` : def.name}
-      className="flex items-center justify-between px-2 py-1 bg-panel-hover hover:bg-slate-700/40 rounded cursor-grab text-xs"
+      className="flex items-center justify-between px-2 py-1 bg-slate-100 hover:bg-slate-200 rounded cursor-grab text-xs"
     >
       <span className="truncate">{def.name}</span>
       {def.source?.platform === 'aliexpress' && (
-        <span className="text-[8px] text-orange-400 ml-1">AE</span>
+        <span className="text-[8px] text-orange-600 ml-1">AE</span>
       )}
     </div>
   );

@@ -1,7 +1,7 @@
 {
   "id": "ae-rocker-panel-6gang-usb-volt",
   "kind": "composite",
-  "name": "6-Gang Rocker Panel + 4.2A USB + Voltmeter (NICEYARD)",
+  "name": "6-Gang Rocker Panel + 4.2A USB + Voltmeter + 12V Cig Outlet (NICEYARD)",
   "imageRef": "/components/rocker-panel-6gang-usb-volt/main.jpg",
   "size": { "w": 320, "h": 220 },
   "ports": [
@@ -24,17 +24,42 @@
     { "id": "usba+", "label": "Ua+", "rel": { "x": 1.0,  "y": 0.20 }, "role": "source" },
     { "id": "usba-", "label": "Ua-", "rel": { "x": 1.0,  "y": 0.35 }, "role": "sink" },
     { "id": "usbb+", "label": "Ub+", "rel": { "x": 1.0,  "y": 0.55 }, "role": "source" },
-    { "id": "usbb-", "label": "Ub-", "rel": { "x": 1.0,  "y": 0.70 }, "role": "sink" }
+    { "id": "usbb-", "label": "Ub-", "rel": { "x": 1.0,  "y": 0.70 }, "role": "sink" },
+
+    { "id": "cig+",  "label": "Cig+", "rel": { "x": 1.0, "y": 0.85 }, "role": "source" },
+    { "id": "cig-",  "label": "Cig-", "rel": { "x": 1.0, "y": 0.92 }, "role": "sink" }
   ],
   "specs": {
     "switchRatedA": 20,
     "totalRatedA": 80,
-    "voltmeterRange": "5-30V"
+    "voltmeterRange": "5-30V",
+    "usbOutputV": 5,
+    "usbOutputA": 2.1,
+    "usbTotalA": 4.2,
+    "cigOutletV": 12,
+    "cigOutletA": 10,
+    "switchType": "rocker, illuminated (blue/green/red LED)",
+    "panelMaterial": "ABS plastic, marine-grade",
+    "operatingVoltage": "12V/24V DC",
+    "_raw_item_diameter": "13",
+    "_raw_item_weight": "430",
+    "_raw_item_height": "12",
+    "_raw_item_width": "13",
+    "_raw_item_length": "20",
+    "_raw_external_testing_certification": "ce"
   },
+  "description": "Marine/RV rocker switch panel combining 6 illuminated 20A rocker switches, dual-port 4.2A USB charger (2x 2.1A @ 5V), digital voltmeter (5-30V), and a 12V cigarette lighter / accessory socket on a single ABS waterproof plate. Pre-wired internally so installation only requires connecting IN+/IN- to the battery bus and one OUT pair per circuit.",
+  "packageContents": [
+    "1x 6-gang rocker switch panel (with USB, voltmeter, and 12V cigarette outlet pre-installed)"
+  ],
+  "gallery": [
+    "https://ae01.alicdn.com/kf/S89bd5c353bf14759ac77f682e9a9fcee9.jpg"
+  ],
   "subComponents": [
     { "id": "vm",  "subKind": "indicator", "label": "Voltmeter",     "specs": { "vRange": "5-30" } },
     { "id": "ua",  "subKind": "dcdc",      "label": "USB-A 5V/2.1A", "specs": { "vIn": 12, "vOut": 5, "iLimitA": 2.1, "eff": 0.85 } },
     { "id": "ub",  "subKind": "dcdc",      "label": "USB-B 5V/2.1A", "specs": { "vIn": 12, "vOut": 5, "iLimitA": 2.1, "eff": 0.85 } },
+    { "id": "cig", "subKind": "dcdc",      "label": "12V Cigarette Lighter", "specs": { "vIn": 12, "vOut": 12, "iLimitA": 10, "eff": 1.0 } },
     { "id": "sw1", "subKind": "switch",    "label": "SW1", "specs": { "ratedA": 20 } },
     { "id": "sw2", "subKind": "switch",    "label": "SW2", "specs": { "ratedA": 20 } },
     { "id": "sw3", "subKind": "switch",    "label": "SW3", "specs": { "ratedA": 20 } },
@@ -52,9 +77,11 @@
     { "a": { "external": "in+" }, "b": { "subId": "ua",  "portId": "IN+" } },
     { "a": { "external": "in+" }, "b": { "subId": "ub",  "portId": "IN+" } },
     { "a": { "external": "in+" }, "b": { "subId": "vm",  "portId": "+" } },
+    { "a": { "external": "in+" }, "b": { "subId": "cig", "portId": "IN+" } },
     { "a": { "external": "in-" }, "b": { "subId": "ua",  "portId": "IN-" } },
     { "a": { "external": "in-" }, "b": { "subId": "ub",  "portId": "IN-" } },
     { "a": { "external": "in-" }, "b": { "subId": "vm",  "portId": "-" } },
+    { "a": { "external": "in-" }, "b": { "subId": "cig", "portId": "IN-" } },
     { "a": { "external": "in-" }, "b": { "external": "sw1-" } },
     { "a": { "external": "in-" }, "b": { "external": "sw2-" } },
     { "a": { "external": "in-" }, "b": { "external": "sw3-" } },
@@ -70,7 +97,9 @@
     { "a": { "subId": "ua",  "portId": "OUT+" }, "b": { "external": "usba+" } },
     { "a": { "subId": "ua",  "portId": "OUT-" }, "b": { "external": "usba-" } },
     { "a": { "subId": "ub",  "portId": "OUT+" }, "b": { "external": "usbb+" } },
-    { "a": { "subId": "ub",  "portId": "OUT-" }, "b": { "external": "usbb-" } }
+    { "a": { "subId": "ub",  "portId": "OUT-" }, "b": { "external": "usbb-" } },
+    { "a": { "subId": "cig", "portId": "OUT+" }, "b": { "external": "cig+" } },
+    { "a": { "subId": "cig", "portId": "OUT-" }, "b": { "external": "cig-" } }
   ],
   "qtyOwned": 1,
   "source": {

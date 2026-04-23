@@ -1,18 +1,53 @@
 {
   "id": "ae-solder-seal-butt-1000pc",
   "kind": "connector",
-  "name": "Heat-Shrink Solder Seal Butt Connectors (1000pc, Mini Blocks)",
+  "name": "Heat-Shrink Solder Seal Butt Connectors (1000pc Kit, HXT-11/21/31/41)",
   "imageRef": "/components/solder-seal-butt-1000pc/main.jpg",
   "size": { "w": 80, "h": 40 },
   "ports": [
     { "id": "a", "label": "A", "rel": { "x": 0, "y": 0.5 }, "role": "passthrough" },
     { "id": "b", "label": "B", "rel": { "x": 1, "y": 0.5 }, "role": "passthrough" }
   ],
-  "specs": { "ratedA": 22, "gaugeAWG": 16, "kitCount": 1000 },
+  "specs": {
+    "ratedA": 22,
+    "gaugeAWG": 16,
+    "kitCount": 1000,
+    "connectorFamily": "heat-shrink solder-seal butt splice",
+    "wireGaugeRangeAWG": [26, 10],
+    "minShrinkTempC": 80,
+    "minSolderMeltTempC": 138,
+    "waterproof": true,
+    "insulated": true,
+    "applicationEnv": ["marine", "automotive", "outdoor"],
+    "sizeBreakdown": [
+      { "model": "HXT-11", "color": "white",  "awg": "26-24", "mm2": "0.25-0.34", "qtyPerKit": 160 },
+      { "model": "HXT-21", "color": "red",    "awg": "22-18", "mm2": "0.5-1.0",   "qtyPerKit": 400 },
+      { "model": "HXT-31", "color": "blue",   "awg": "16-14", "mm2": "1.5-2.5",   "qtyPerKit": 360 },
+      { "model": "HXT-41", "color": "yellow", "awg": "12-10", "mm2": "4.0-6.0",   "qtyPerKit": 80  }
+    ],
+    "_raw_min_shrink_temperature": "80°C",
+    "_raw_min_solder_melt_temperature": "138°C",
+    "_raw_kit_total_pieces": "1000",
+    "_raw_color_codes": "white 26-24 AWG, red 22-18 AWG, blue 16-14 AWG, yellow 12-10 AWG",
+    "_raw_kit_size_options_offered": "50/100/250/280/300/500/608/828/900/1000pcs",
+    "_raw_use": "waterproof butt splice for marine, automotive, outdoor wiring",
+    "_raw_application": "permanent waterproof inline wire-to-wire splice; heat with hot-air gun until solder ring flows and shrink sleeve seals"
+  },
   "connectorType": "heatShrinkSolder",
-  "wireGaugeRange": [22, 10],
+  "wireGaugeRange": [26, 10],
   "canAttachToWireEnd": false,
   "qtyOwned": 1000,
+  "description": "Single-use heat-shrink solder-seal butt splice. Pre-loaded low-temp solder ring (melts ~138°C) sits between two adhesive-lined polyolefin sleeves; one shot from a heat gun melts the solder onto stripped wire ends and shrinks the sleeve to a waterproof, insulated, vibration-resistant joint. Color codes the AWG range (white 26-24, red 22-18, blue 16-14, yellow 12-10). Kit ships in a sorted 4-tray clear case totaling 1000 pieces.",
+  "packageContents": [
+    "1x clear plastic storage case with 4 compartments",
+    "160x HXT-11 white  splices (26-24 AWG / 0.25-0.34 mm²)",
+    "400x HXT-21 red    splices (22-18 AWG / 0.5-1.0 mm²)",
+    "360x HXT-31 blue   splices (16-14 AWG / 1.5-2.5 mm²)",
+    "80x  HXT-41 yellow splices (12-10 AWG / 4.0-6.0 mm²)"
+  ],
+  "gallery": [
+    "/components/solder-seal-butt-1000pc/main.jpg"
+  ],
   "source": {
     "platform": "aliexpress",
     "url": "https://www.aliexpress.com/item/1005008648689545.html",

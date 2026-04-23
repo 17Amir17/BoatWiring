@@ -14,11 +14,11 @@ type WireEdgeType = Edge<WireData, 'wire'>;
 
 function colorFor(currentA: number, ampacity: number): string {
   const ratio = Math.min(2, Math.abs(currentA) / Math.max(ampacity, 1));
-  if (ratio < 0.05) return '#3a3f47';
-  if (ratio < 0.5)  return '#22c55e';
-  if (ratio < 0.85) return '#facc15';
-  if (ratio < 1.0)  return '#f97316';
-  return '#ef4444';
+  if (ratio < 0.05) return '#94a3b8';
+  if (ratio < 0.5)  return '#16a34a';
+  if (ratio < 0.85) return '#eab308';
+  if (ratio < 1.0)  return '#ea580c';
+  return '#dc2626';
 }
 
 const WireEdge = ({
@@ -67,7 +67,7 @@ const WireEdge = ({
       <EdgeLabelRenderer>
         {selected && (
           <div
-            className="absolute pointer-events-none px-1.5 py-0.5 rounded bg-panel-bg/90 border border-panel-border text-[10px] text-slate-200"
+            className="absolute pointer-events-none px-1.5 py-0.5 rounded bg-white/95 border border-slate-300 text-[10px] text-slate-700 shadow-sm"
             style={{
               transform: `translate(-50%, -50%) translate(${labelX}px, ${labelY}px)`,
             }}

@@ -53,19 +53,19 @@ function PortPin({
           width: 11,
           height: 11,
           background: dotColor,
-          border: '2px solid #f8fafc',
+          border: '2px solid #ffffff',
           borderRadius: 8,
-          boxShadow: '0 0 0 1px rgba(0,0,0,0.7)',
+          boxShadow: '0 0 0 1px rgba(15,23,42,0.6)',
           transform: 'translate(-50%, -50%)',
         }}
       />
       <span
-        className="absolute pointer-events-none text-[9px] font-semibold text-slate-100 select-none"
+        className="absolute pointer-events-none text-[9px] font-semibold text-slate-700 select-none"
         style={{
           left: px,
           top: py,
           ...labelOffsetFor(pos, px, py),
-          textShadow: '0 0 3px #0f172a, 0 0 5px #0f172a',
+          textShadow: '0 0 3px #ffffff, 0 0 5px #ffffff',
           whiteSpace: 'nowrap',
         }}
       >
@@ -120,8 +120,8 @@ const ComponentNode = ({ id, data, selected }: NodeProps<ComponentNodeType>) => 
     >
       {/* Component name above the body (well outside, so pin labels don't collide) */}
       <div
-        className="absolute -top-4 left-1/2 -translate-x-1/2 text-[10px] text-slate-300 font-semibold pointer-events-none whitespace-nowrap select-none"
-        style={{ textShadow: '0 0 3px #0f172a' }}
+        className="absolute -top-4 left-1/2 -translate-x-1/2 text-[10px] text-slate-700 font-semibold pointer-events-none whitespace-nowrap select-none"
+        style={{ textShadow: '0 0 3px #ffffff' }}
       >
         {def.name.length > 28 ? def.name.slice(0, 26) + '…' : def.name}
       </div>
@@ -149,7 +149,7 @@ const ComponentNode = ({ id, data, selected }: NodeProps<ComponentNodeType>) => 
             <line
               key={p.id + '-stub'}
               x1={ln.x1} y1={ln.y1} x2={ln.x2} y2={ln.y2}
-              stroke="#94a3b8" strokeWidth="1.6" strokeLinecap="round"
+              stroke="#475569" strokeWidth="1.6" strokeLinecap="round"
             />
           );
         })}

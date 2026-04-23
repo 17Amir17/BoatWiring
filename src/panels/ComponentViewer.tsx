@@ -32,10 +32,10 @@ export default function ComponentViewer({ defId, onClose }: { defId: string; onC
 
   if (!def) {
     return (
-      <div className="fixed inset-0 bg-panel-bg flex items-center justify-center text-slate-200">
+      <div className="fixed inset-0 bg-panel-bg flex items-center justify-center text-slate-800">
         <div>
-          No component with id <code className="text-yellow-300">{defId}</code>.
-          <button className="ml-3 px-2 py-1 bg-panel-hover rounded text-xs" onClick={onClose}>×</button>
+          No component with id <code className="text-amber-700">{defId}</code>.
+          <button className="ml-3 px-2 py-1 bg-slate-100 rounded text-xs" onClick={onClose}>×</button>
         </div>
       </div>
     );
@@ -49,16 +49,16 @@ export default function ComponentViewer({ defId, onClose }: { defId: string; onC
   return (
     <div className="fixed inset-0 z-50 bg-panel-bg overflow-auto">
       <div className="flex items-center gap-3 px-4 h-10 border-b border-panel-border text-xs">
-        <span className="text-slate-400">Component Viewer:</span>
-        <span className="text-slate-100 font-semibold">{def.name}</span>
+        <span className="text-slate-600">Component Viewer:</span>
+        <span className="text-slate-900 font-semibold">{def.name}</span>
         <span className="text-slate-500">({def.kind})</span>
-        <span className="text-slate-500">id: <code className="text-yellow-300">{def.id}</code></span>
+        <span className="text-slate-500">id: <code className="text-amber-700">{def.id}</code></span>
         <div className="ml-auto flex items-center gap-2">
           <span className="text-slate-500">scale</span>
           {[1, 2, 3, 4].map((n) => (
             <button
               key={n}
-              className={`px-2 py-0.5 rounded ${scale === n ? 'bg-yellow-700/50 text-yellow-100' : 'bg-panel-hover'}`}
+              className={`px-2 py-0.5 rounded ${scale === n ? 'bg-yellow-200 text-yellow-900' : 'bg-slate-100'}`}
               onClick={() => setScale(n)}
             >
               {n}×
@@ -66,23 +66,23 @@ export default function ComponentViewer({ defId, onClose }: { defId: string; onC
           ))}
           <label className="flex items-center gap-1 ml-2">
             <input type="checkbox" checked={showGrid} onChange={(e) => setShowGrid(e.target.checked)} />
-            <span className="text-slate-400">grid</span>
+            <span className="text-slate-600">grid</span>
           </label>
           <label className="flex items-center gap-1 ml-2">
             <input type="checkbox" checked={showPhoto} onChange={(e) => setShowPhoto(e.target.checked)} />
-            <span className="text-slate-400">photo</span>
+            <span className="text-slate-600">photo</span>
           </label>
           <label className="flex items-center gap-1 ml-2">
             <input type="checkbox" checked={showTable} onChange={(e) => setShowTable(e.target.checked)} />
-            <span className="text-slate-400">port table</span>
+            <span className="text-slate-600">port table</span>
           </label>
-          <button className="ml-2 px-2 py-0.5 rounded bg-panel-hover" onClick={onClose}>esc / close</button>
+          <button className="ml-2 px-2 py-0.5 rounded bg-slate-100" onClick={onClose}>esc / close</button>
         </div>
       </div>
 
       <div className={`grid ${showPhoto ? 'grid-cols-2' : 'grid-cols-1'} gap-4 p-6`}>
         {/* Sim render */}
-        <div className="bg-slate-900/40 border border-panel-border rounded p-4">
+        <div className="bg-white border border-panel-border rounded p-4">
           <div className="text-[10px] uppercase tracking-wide text-slate-500 mb-2">
             Sim render — {def.size.w}×{def.size.h}px (scaled {scale}×)
           </div>
@@ -136,14 +136,14 @@ export default function ComponentViewer({ defId, onClose }: { defId: string; onC
           </div>
           <div className="text-[10px] text-slate-500 mt-3">
             Pins shown OUTSIDE the body via stubs. Each pin is positioned at
-            <code className="mx-1 text-yellow-300">port.rel × size</code>. Edit the JSON
+            <code className="mx-1 text-amber-700">port.rel × size</code>. Edit the JSON
             and Vite will hot-reload.
           </div>
         </div>
 
         {/* Product photo */}
         {showPhoto && (
-        <div className="bg-slate-900/40 border border-panel-border rounded p-4">
+        <div className="bg-white border border-panel-border rounded p-4">
           <div className="text-[10px] uppercase tracking-wide text-slate-500 mb-2">
             Product photo
           </div>
@@ -160,7 +160,7 @@ export default function ComponentViewer({ defId, onClose }: { defId: string; onC
           </div>
           {def.source && (
             <a
-              className="block mt-2 text-[10px] text-orange-300 underline truncate"
+              className="block mt-2 text-[10px] text-orange-600 underline truncate"
               href={def.source.url}
               target="_blank"
               rel="noreferrer"
@@ -173,7 +173,7 @@ export default function ComponentViewer({ defId, onClose }: { defId: string; onC
 
         {/* Port list */}
         {showTable && (
-        <div className="col-span-2 bg-slate-900/40 border border-panel-border rounded p-4">
+        <div className="col-span-2 bg-white border border-panel-border rounded p-4">
           <div className="text-[10px] uppercase tracking-wide text-slate-500 mb-2">
             Ports ({def.ports.length})
           </div>
@@ -192,10 +192,10 @@ export default function ComponentViewer({ defId, onClose }: { defId: string; onC
             </thead>
             <tbody>
               {def.ports.map((p) => (
-                <tr key={p.id} className="text-slate-200 border-t border-panel-border/40">
+                <tr key={p.id} className="text-slate-800 border-t border-panel-border/40">
                   <td className="font-mono">{p.id}</td>
                   <td>{p.label}</td>
-                  <td className="text-slate-400">{p.role}</td>
+                  <td className="text-slate-600">{p.role}</td>
                   <td className="text-right font-mono">{p.rel.x.toFixed(3)}</td>
                   <td className="text-right font-mono">{p.rel.y.toFixed(3)}</td>
                   <td className="text-right font-mono">{(p.rel.x * w).toFixed(0)}</td>
@@ -256,7 +256,7 @@ function PinDot({ port, w, h }: { port: Port; w: number; h: number }) {
         }}
       />
       <span
-        className="absolute pointer-events-none text-[10px] font-semibold text-slate-100 select-none"
+        className="absolute pointer-events-none text-[10px] font-semibold text-slate-900 select-none"
         style={{
           left: px, top: py,
           ...labelStyle,

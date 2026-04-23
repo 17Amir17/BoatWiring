@@ -1,7 +1,8 @@
 import { useAppStore } from '../state/store';
 import type { Fault } from '../types';
 import { FAULT_PRESETS } from '../lib/sim/faults';
-import { wireResistance } from '../lib/sim/awg';
+import { wireAmpacity, wireResistance } from '../lib/sim/awg';
+import { expectedCurrentBetween, pickWireForCurrent } from '../lib/wires/pickWire';
 
 export default function Inspector() {
   const sel = useAppStore((s) => s.selection);
@@ -17,6 +18,7 @@ export default function Inspector() {
   const clearFaults = useAppStore((s) => s.clearFaults);
   const removeNode = useAppStore((s) => s.removeNode);
   const removeEdge = useAppStore((s) => s.removeEdge);
+  const setEdgeWire = useAppStore((s) => s.setEdgeWire);
 
   const node = sel.nodeIds.length === 1 ? nodes.find((n) => n.id === sel.nodeIds[0]) : null;
   const edge = sel.edgeIds.length === 1 ? edges.find((e) => e.id === sel.edgeIds[0]) : null;
@@ -32,10 +34,10 @@ export default function Inspector() {
         return (
           <div>
             <div className="font-semibold mb-1">{def.name}</div>
-            <div className="text-[10px] text-slate-400">{def.kind}</div>
+            <div className="text-[10px] text-slate-600">{def.kind}</div>
             {def.source && (
               <a
-                className="block text-[10px] text-orange-300 underline truncate"
+                className="block text-[10px] text-orange-600 underline truncate"
                 href={def.source.url}
                 target="_blank"
                 rel="noreferrer"
@@ -53,14 +55,14 @@ export default function Inspector() {
               {def.ports.map((p) => {
                 const v = portVoltages[`${node.id}/${p.id}`];
                 return (
-                  <div key={p.id} className="flex justify-between text-slate-300">
+                  <div key={p.id} className="flex justify-between text-slate-700">
                     <span>{p.label}</span>
                     <span className="font-mono">{v !== undefined ? `${v.toFixed(2)} V` : '—'}</span>
                   </div>
                 );
               })}
               {(def.kind === 'fuse' || def.kind === 'breaker') && (
-                <div className={fuseOpen[node.id] ? 'text-red-400' : 'text-emerald-400'}>
+                <div className={fuseOpen[node.id] ? 'text-red-600' : 'text-emerald-600'}>
                   {fuseOpen[node.id] ? 'BLOWN' : 'INTACT'}
                 </div>
               )}
@@ -70,8 +72,8 @@ export default function Inspector() {
             <div className="text-xs font-mono space-y-0.5">
               {Object.entries(def.specs).map(([k, v]) => (
                 <div key={k} className="flex justify-between">
-                  <span className="text-slate-400">{k}</span>
-                  <span className="text-slate-200">{String(v)}</span>
+                  <span className="text-slate-600">{k}</span>
+                  <span className="text-slate-800">{String(v)}</span>
                 </div>
               ))}
             </div>
@@ -83,7 +85,7 @@ export default function Inspector() {
             />
 
             <button
-              className="mt-3 w-full text-[10px] py-1 rounded bg-red-900/40 hover:bg-red-900/60 text-red-200"
+              className="mt-3 w-full text-[10px] py-1 rounded bg-red-100 hover:bg-red-200 text-red-700"
               onClick={() => removeNode(node.id)}
             >
               Remove component
@@ -99,13 +101,21 @@ export default function Inspector() {
         const len = edge.data!.lengthFt;
         const r = wireResistance(wDef.gaugeAWG, len);
         const lossW = I * I * r;
+        const overload = Math.abs(I) > wDef.maxAmps;
+        const srcDef = defs.get(nodes.find((n) => n.id === edge.source)?.data.defId ?? '');
+        const tgtDef = defs.get(nodes.find((n) => n.id === edge.target)?.data.defId ?? '');
+        const recommendedA = expectedCurrentBetween(srcDef, tgtDef);
+        const recommendedId = pickWireForCurrent(wireDefs, recommendedA, wDef.id);
+        const recommendedWire = wireDefs.get(recommendedId);
+        const isRecommended = recommendedId === wDef.id;
+        const wires = [...wireDefs.values()].sort((a, b) => a.gaugeAWG - b.gaugeAWG);
         return (
           <div>
             <div className="font-semibold mb-1">{wDef.name}</div>
-            <div className="text-[10px] text-slate-400">wire</div>
+            <div className="text-[10px] text-slate-600">wire</div>
             {wDef.source && (
               <a
-                className="block text-[10px] text-orange-300 underline truncate"
+                className="block text-[10px] text-orange-600 underline truncate"
                 href={wDef.source.url}
                 target="_blank"
                 rel="noreferrer"
@@ -113,12 +123,32 @@ export default function Inspector() {
                 {wDef.source.sellerTitle}
               </a>
             )}
-            <div className="mt-2 space-y-1 text-xs">
-              <div className="flex justify-between"><span>Gauge</span><span className="font-mono">{wDef.gaugeAWG} AWG</span></div>
+
+            <div className="mt-2 text-[10px] text-slate-500">Wire type</div>
+            <select
+              className="w-full bg-slate-100 border border-panel-border rounded px-1 py-1 text-xs"
+              value={wDef.id}
+              onChange={(e) => setEdgeWire(edge.id, e.target.value)}
+            >
+              {wires.map((w) => (
+                <option key={w.id} value={w.id}>
+                  {w.gaugeAWG} AWG — {w.name} ({w.maxAmps} A)
+                </option>
+              ))}
+            </select>
+            {recommendedWire && recommendedA > 0 && (
+              <div className={`mt-1 text-[10px] ${isRecommended ? 'text-emerald-600' : 'text-amber-700'}`}>
+                {isRecommended
+                  ? `✓ Correct gauge (~${recommendedA.toFixed(1)} A expected)`
+                  : `Recommended: ${recommendedWire.gaugeAWG} AWG (~${recommendedA.toFixed(1)} A expected)`}
+              </div>
+            )}
+
+            <div className="mt-3 space-y-1 text-xs">
               <div className="flex justify-between">
-                <span>Length</span>
+                <span>Length (ft)</span>
                 <input
-                  className="w-16 bg-panel-hover border border-panel-border rounded px-1 text-right font-mono"
+                  className="w-16 bg-slate-100 border border-panel-border rounded px-1 text-right font-mono"
                   type="number"
                   step="0.5"
                   value={len}
@@ -135,10 +165,15 @@ export default function Inspector() {
                   }}
                 />
               </div>
-              <div className="flex justify-between"><span>Current</span><span className="font-mono">{I.toFixed(2)} A</span></div>
+              <div className="flex justify-between">
+                <span>Current</span>
+                <span className={`font-mono ${overload ? 'text-red-600 font-bold' : ''}`}>
+                  {I.toFixed(2)} A {overload && '⚠ overload'}
+                </span>
+              </div>
+              <div className="flex justify-between"><span>Ampacity</span><span className="font-mono">{wireAmpacity(wDef.gaugeAWG)} A</span></div>
               <div className="flex justify-between"><span>Resistance</span><span className="font-mono">{(r * 1000).toFixed(2)} mΩ</span></div>
               <div className="flex justify-between"><span>Power loss</span><span className="font-mono">{lossW.toFixed(3)} W</span></div>
-              <div className="flex justify-between"><span>Ampacity</span><span className="font-mono">{wDef.maxAmps} A</span></div>
             </div>
             <FaultControls
               faults={edge.data?.faults ?? []}
@@ -146,7 +181,7 @@ export default function Inspector() {
               onClear={() => clearFaults({ kind: 'edge', id: edge.id })}
             />
             <button
-              className="mt-3 w-full text-[10px] py-1 rounded bg-red-900/40 hover:bg-red-900/60 text-red-200"
+              className="mt-3 w-full text-[10px] py-1 rounded bg-red-100 hover:bg-red-200 text-red-700"
               onClick={() => removeEdge(edge.id)}
             >
               Remove wire
@@ -174,7 +209,7 @@ function FaultControls({
         {FAULT_PRESETS.map((p) => (
           <button
             key={p.label}
-            className="w-full text-left text-[10px] px-2 py-1 rounded bg-panel-hover hover:bg-slate-700/40"
+            className="w-full text-left text-[10px] px-2 py-1 rounded bg-slate-100 hover:bg-slate-200"
             onClick={() => onInject(p.build())}
           >
             + {p.label}
@@ -182,7 +217,7 @@ function FaultControls({
         ))}
         {faults.length > 0 && (
           <button
-            className="w-full text-[10px] px-2 py-1 rounded bg-emerald-900/30 hover:bg-emerald-900/50 text-emerald-200"
+            className="w-full text-[10px] px-2 py-1 rounded bg-emerald-100 hover:bg-emerald-200 text-emerald-700"
             onClick={onClear}
           >
             clear all

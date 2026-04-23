@@ -8,11 +8,54 @@
     { "id": "a", "label": "A", "rel": { "x": 0, "y": 0.5 }, "role": "passthrough" },
     { "id": "b", "label": "B", "rel": { "x": 1, "y": 0.5 }, "role": "passthrough" }
   ],
-  "specs": { "ratedA": 22, "gaugeAWG": 16, "kitCount": 120 },
+  "specs": {
+    "ratedA": 22,
+    "gaugeAWG": 16,
+    "kitCount": 120,
+    "formFactor": "assorted-kit",
+    "insulationType": "heat-shrink (adhesive-lined polyolefin)",
+    "waterproof": true,
+    "marineGrade": true,
+    "colorCodes": {
+      "red": "AWG 22-16 (~10A)",
+      "blue": "AWG 16-14 (~15A)",
+      "yellow": "AWG 12-10 (~22A)"
+    },
+    "connectorTypesIncluded": [
+      "butt splice",
+      "ring terminal",
+      "fork (spade) terminal",
+      "male quick-disconnect",
+      "female quick-disconnect"
+    ],
+    "_raw_model_number": "120Pcs Heat Shrink Wire Connectors",
+    "_raw_is_customized": "Yes",
+    "_raw_type": "Crimp Terminal",
+    "_raw_origin": "Mainland China",
+    "_raw_color_option": "120Pcs in box"
+  },
   "connectorType": "buttSplice",
   "wireGaugeRange": [22, 10],
   "canAttachToWireEnd": false,
   "qtyOwned": 120,
+  "description": "Assorted 120-piece kit of heat-shrink waterproof crimp connectors for marine and automotive wiring. Color-coded by AWG range: red (22-16 AWG), blue (16-14 AWG), yellow (12-10 AWG). Includes butt splices plus ring, fork/spade, and male/female quick-disconnect terminals. Adhesive-lined polyolefin sleeve seals the crimp when shrunk with a heat gun.",
+  "packageContents": [
+    "Butt splice connectors (red/blue/yellow, AWG 22-10)",
+    "Ring terminals (red/blue/yellow)",
+    "Fork (spade) terminals #10 stud (red/blue/yellow)",
+    "Male quick-disconnect terminals (red/blue/yellow)",
+    "Female quick-disconnect terminals (red/blue/yellow)",
+    "120 pieces total in compartmented storage box",
+    "Per box label: 5 pcs each type per color, 20 pcs total per color group across the listed terminal types (mix per color)"
+  ],
+  "gallery": [
+    "https://ae01.alicdn.com/kf/S4b59027ca1e948288797778b0c017c0dy.jpg",
+    "https://ae-pic-a1.aliexpress-media.com/kf/Sa976459fb7724bf1bca6e153a425a8ebg.png",
+    "https://ae-pic-a1.aliexpress-media.com/kf/See3545d5c8384e4c8b8fcbd9510d9f99q.png",
+    "https://ae-pic-a1.aliexpress-media.com/kf/Sb7f6dd6f36ab431db1c9c1904ba9791eP.png",
+    "https://ae-pic-a1.aliexpress-media.com/kf/Sf3272e722c5a4b2bbffd17cb1958eaaaH.png",
+    "https://ae-pic-a1.aliexpress-media.com/kf/S136cdd91e1b740c898a1fc931f5176ada.png"
+  ],
   "source": {
     "platform": "aliexpress",
     "url": "https://www.aliexpress.com/item/1005006085452232.html",

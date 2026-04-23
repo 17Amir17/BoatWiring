@@ -74,7 +74,7 @@ function CanvasInner() {
         snapToGrid
         snapGrid={[8, 8]}
       >
-        <Background gap={16} color="#1e2530" />
+        <Background gap={16} color="#e2e8f0" />
         <Controls />
       </ReactFlow>
     </div>

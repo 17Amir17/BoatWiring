@@ -58,13 +58,13 @@ export default function BillOfMaterials() {
         </thead>
         <tbody>
           {rows.map((r) => (
-            <tr key={r.id} className={r.over ? 'text-red-400' : 'text-slate-200'}>
+            <tr key={r.id} className={r.over ? 'text-red-600' : 'text-slate-800'}>
               <td className="truncate max-w-[180px]">
                 {r.src ? (
                   <a className="underline" href={r.src} target="_blank" rel="noreferrer">{r.name}</a>
                 ) : r.name}
               </td>
-              <td className="text-slate-400">{r.kind}</td>
+              <td className="text-slate-600">{r.kind}</td>
               <td className="text-right font-mono">{r.qtyUsed}</td>
               <td className="text-right font-mono">{r.qtyOwned ?? '—'}</td>
             </tr>
