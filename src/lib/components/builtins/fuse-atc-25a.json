@@ -1,0 +1,11 @@
+{
+  "id": "fuse-atc-25a",
+  "kind": "fuse",
+  "name": "ATC 25A",
+  "size": { "w": 60, "h": 70 },
+  "ports": [
+    { "id": "a", "label": "A", "rel": { "x": 0.30, "y": 1.0 }, "role": "passthrough" },
+    { "id": "b", "label": "B", "rel": { "x": 0.70, "y": 1.0 }, "role": "passthrough" }
+  ],
+  "specs": { "ratingA": 25, "formFactor": "ATC", "voltageRating": 32 }
+}

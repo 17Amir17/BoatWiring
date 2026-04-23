@@ -1,0 +1,11 @@
+{
+  "id": "fuse-mrbf-40a",
+  "kind": "fuse",
+  "name": "MRBF 40A",
+  "size": { "w": 90, "h": 60 },
+  "ports": [
+    { "id": "a", "label": "A", "rel": { "x": 0.0, "y": 0.5 }, "role": "passthrough" },
+    { "id": "b", "label": "B", "rel": { "x": 1.0, "y": 0.5 }, "role": "passthrough" }
+  ],
+  "specs": { "ratingA": 40, "formFactor": "MRBF", "voltageRating": 58 }
+}

@@ -1,0 +1,11 @@
+{
+  "id": "load-bilge-pump",
+  "kind": "load",
+  "name": "Bilge Pump 30W",
+  "size": { "w": 80, "h": 80 },
+  "ports": [
+    { "id": "in",  "label": "+", "rel": { "x": 0.30, "y": 1.0 }, "role": "sink" },
+    { "id": "out", "label": "-", "rel": { "x": 0.70, "y": 1.0 }, "role": "sink" }
+  ],
+  "specs": { "wattsOn": 30, "vMin": 10, "vMax": 14, "inrushA": 5 }
+}

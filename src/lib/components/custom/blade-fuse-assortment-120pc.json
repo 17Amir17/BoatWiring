@@ -2,7 +2,8 @@
   "id": "ae-blade-fuse-assortment-120pc",
   "kind": "accessory",
   "name": "ATC Blade Fuse Assortment (120pc, EMA Global Direct)",
-  "size": { "w": 60, "h": 40 },
+  "imageRef": "/components/blade-fuse-assortment-120pc/main.jpg",
+  "size": { "w": 140, "h": 100 },
   "ports": [],
   "specs": {
     "kitCount": 120,
@@ -18,7 +19,7 @@
     "sellerTitle": "300/180/120pcs Car Blade Fuse Assortment Kit Auto Truck Automotive Medium Small Fuse Mixed Motorcycle Circuit Fuse With Box",
     "seller": "EMA Global Direct Store",
     "priceUSD": 4.0,
-    "images": [],
-    "fetchedAt": "2026-04-23T10:00:00.000Z"
+    "images": ["/components/blade-fuse-assortment-120pc/main.jpg"],
+    "fetchedAt": "2026-04-23T11:00:00.000Z"
   }
 }

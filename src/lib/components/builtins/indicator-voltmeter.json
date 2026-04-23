@@ -1,0 +1,11 @@
+{
+  "id": "indicator-voltmeter",
+  "kind": "indicator",
+  "name": "LED Voltmeter",
+  "size": { "w": 70, "h": 50 },
+  "ports": [
+    { "id": "+", "label": "+", "rel": { "x": 0.0, "y": 0.5 }, "role": "sink" },
+    { "id": "-", "label": "-", "rel": { "x": 1.0, "y": 0.5 }, "role": "sink" }
+  ],
+  "specs": { "vRange": "6-30" }
+}

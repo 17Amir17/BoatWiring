@@ -1,0 +1,13 @@
+{
+  "id": "dcdc-usb-2.1a",
+  "kind": "dcdc",
+  "name": "USB-A 5V 2.1A",
+  "size": { "w": 80, "h": 60 },
+  "ports": [
+    { "id": "IN+",  "label": "IN+",  "rel": { "x": 0.0, "y": 0.30 }, "role": "sink" },
+    { "id": "IN-",  "label": "IN-",  "rel": { "x": 0.0, "y": 0.70 }, "role": "sink" },
+    { "id": "OUT+", "label": "USB+", "rel": { "x": 1.0, "y": 0.30 }, "role": "source" },
+    { "id": "OUT-", "label": "USB-", "rel": { "x": 1.0, "y": 0.70 }, "role": "sink" }
+  ],
+  "specs": { "vIn": 12, "vOut": 5, "iLimitA": 2.1, "eff": 0.85 }
+}

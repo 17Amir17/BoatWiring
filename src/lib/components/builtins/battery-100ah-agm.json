@@ -1,0 +1,11 @@
+{
+  "id": "battery-100ah-agm",
+  "kind": "battery",
+  "name": "100Ah AGM",
+  "size": { "w": 110, "h": 90 },
+  "ports": [
+    { "id": "neg", "label": "-", "rel": { "x": 0.25, "y": 0.0 }, "role": "sink" },
+    { "id": "pos", "label": "+", "rel": { "x": 0.75, "y": 0.0 }, "role": "source" }
+  ],
+  "specs": { "capacityAh": 100, "vNominal": 12.7, "rInternalOhm": 0.012, "chemistry": "AGM" }
+}

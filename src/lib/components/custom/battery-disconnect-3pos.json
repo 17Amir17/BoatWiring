@@ -2,11 +2,12 @@
   "id": "ae-battery-disconnect-3pos",
   "kind": "selectorSwitch",
   "name": "Battery Disconnect Switch 12/24V 200/300/600A 3-pos (Smart Auto Part)",
-  "size": { "w": 100, "h": 100 },
+  "imageRef": "/components/battery-disconnect-3pos/main.png",
+  "size": { "w": 120, "h": 120 },
   "ports": [
-    { "id": "in1", "label": "BAT1", "rel": { "x": 0.05, "y": 0.30 }, "role": "passthrough" },
-    { "id": "in2", "label": "BAT2", "rel": { "x": 0.05, "y": 0.70 }, "role": "passthrough" },
-    { "id": "out", "label": "OUT",  "rel": { "x": 0.95, "y": 0.50 }, "role": "passthrough" }
+    { "id": "in1", "label": "BAT1", "rel": { "x": 0, "y": 0.25 }, "role": "passthrough" },
+    { "id": "in2", "label": "BAT2", "rel": { "x": 0, "y": 0.75 }, "role": "passthrough" },
+    { "id": "out", "label": "OUT",  "rel": { "x": 1, "y": 0.5 },  "role": "passthrough" }
   ],
   "specs": {
     "ratedA": 200,
@@ -26,11 +27,11 @@
   "qtyOwned": 1,
   "source": {
     "platform": "aliexpress",
-    "url": "https://www.aliexpress.com/item/1005007839832073.html",
+    "url": "https://www.aliexpress.com/item/1005004378369483.html",
     "sellerTitle": "Auto Battery Disconnect Switch 12V 24V Marine 200A 300A 600A Dual Battery Mass Switch 2 and 3 Position Cut Off Switch Car Boat (3 position with wire)",
     "seller": "Smart Auto Part Store",
     "priceUSD": 14.0,
-    "images": [],
-    "fetchedAt": "2026-04-23T10:00:00.000Z"
+    "images": ["/components/battery-disconnect-3pos/main.png"],
+    "fetchedAt": "2026-04-23T11:00:00.000Z"
   }
 }

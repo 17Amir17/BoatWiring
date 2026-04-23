@@ -2,26 +2,29 @@
   "id": "ae-rocker-panel-6gang-usb-volt",
   "kind": "composite",
   "name": "6-Gang Rocker Panel + 4.2A USB + Voltmeter (NICEYARD)",
-  "size": { "w": 240, "h": 90 },
+  "imageRef": "/components/rocker-panel-6gang-usb-volt/main.jpg",
+  "size": { "w": 320, "h": 220 },
   "ports": [
-    { "id": "in+",   "label": "IN+",   "rel": { "x": 0.02, "y": 0.30 }, "role": "source" },
-    { "id": "in-",   "label": "IN-",   "rel": { "x": 0.02, "y": 0.70 }, "role": "sink" },
-    { "id": "sw1+",  "label": "SW1+",  "rel": { "x": 0.98, "y": 0.10 }, "role": "source" },
-    { "id": "sw1-",  "label": "SW1-",  "rel": { "x": 0.98, "y": 0.18 }, "role": "sink" },
-    { "id": "sw2+",  "label": "SW2+",  "rel": { "x": 0.98, "y": 0.26 }, "role": "source" },
-    { "id": "sw2-",  "label": "SW2-",  "rel": { "x": 0.98, "y": 0.34 }, "role": "sink" },
-    { "id": "sw3+",  "label": "SW3+",  "rel": { "x": 0.98, "y": 0.42 }, "role": "source" },
-    { "id": "sw3-",  "label": "SW3-",  "rel": { "x": 0.98, "y": 0.50 }, "role": "sink" },
-    { "id": "sw4+",  "label": "SW4+",  "rel": { "x": 0.98, "y": 0.58 }, "role": "source" },
-    { "id": "sw4-",  "label": "SW4-",  "rel": { "x": 0.98, "y": 0.66 }, "role": "sink" },
-    { "id": "sw5+",  "label": "SW5+",  "rel": { "x": 0.98, "y": 0.74 }, "role": "source" },
-    { "id": "sw5-",  "label": "SW5-",  "rel": { "x": 0.98, "y": 0.82 }, "role": "sink" },
-    { "id": "sw6+",  "label": "SW6+",  "rel": { "x": 0.98, "y": 0.90 }, "role": "source" },
-    { "id": "sw6-",  "label": "SW6-",  "rel": { "x": 0.98, "y": 0.96 }, "role": "sink" },
-    { "id": "usba+", "label": "USB-A+","rel": { "x": 0.50, "y": 0.02 }, "role": "source" },
-    { "id": "usba-", "label": "USB-A-","rel": { "x": 0.55, "y": 0.02 }, "role": "sink" },
-    { "id": "usbb+", "label": "USB-B+","rel": { "x": 0.40, "y": 0.02 }, "role": "source" },
-    { "id": "usbb-", "label": "USB-B-","rel": { "x": 0.45, "y": 0.02 }, "role": "sink" }
+    { "id": "in+",   "label": "IN+", "rel": { "x": 0,    "y": 0.30 }, "role": "source" },
+    { "id": "in-",   "label": "IN-", "rel": { "x": 0,    "y": 0.70 }, "role": "sink" },
+
+    { "id": "sw1+",  "label": "1+",  "rel": { "x": 0.13, "y": 1.0 },  "role": "source" },
+    { "id": "sw1-",  "label": "1-",  "rel": { "x": 0.20, "y": 1.0 },  "role": "sink" },
+    { "id": "sw2+",  "label": "2+",  "rel": { "x": 0.27, "y": 1.0 },  "role": "source" },
+    { "id": "sw2-",  "label": "2-",  "rel": { "x": 0.34, "y": 1.0 },  "role": "sink" },
+    { "id": "sw3+",  "label": "3+",  "rel": { "x": 0.41, "y": 1.0 },  "role": "source" },
+    { "id": "sw3-",  "label": "3-",  "rel": { "x": 0.48, "y": 1.0 },  "role": "sink" },
+    { "id": "sw4+",  "label": "4+",  "rel": { "x": 0.55, "y": 1.0 },  "role": "source" },
+    { "id": "sw4-",  "label": "4-",  "rel": { "x": 0.62, "y": 1.0 },  "role": "sink" },
+    { "id": "sw5+",  "label": "5+",  "rel": { "x": 0.69, "y": 1.0 },  "role": "source" },
+    { "id": "sw5-",  "label": "5-",  "rel": { "x": 0.76, "y": 1.0 },  "role": "sink" },
+    { "id": "sw6+",  "label": "6+",  "rel": { "x": 0.83, "y": 1.0 },  "role": "source" },
+    { "id": "sw6-",  "label": "6-",  "rel": { "x": 0.90, "y": 1.0 },  "role": "sink" },
+
+    { "id": "usba+", "label": "Ua+", "rel": { "x": 1.0,  "y": 0.20 }, "role": "source" },
+    { "id": "usba-", "label": "Ua-", "rel": { "x": 1.0,  "y": 0.35 }, "role": "sink" },
+    { "id": "usbb+", "label": "Ub+", "rel": { "x": 1.0,  "y": 0.55 }, "role": "source" },
+    { "id": "usbb-", "label": "Ub-", "rel": { "x": 1.0,  "y": 0.70 }, "role": "sink" }
   ],
   "specs": {
     "switchRatedA": 20,
@@ -29,15 +32,15 @@
     "voltmeterRange": "5-30V"
   },
   "subComponents": [
+    { "id": "vm",  "subKind": "indicator", "label": "Voltmeter",     "specs": { "vRange": "5-30" } },
+    { "id": "ua",  "subKind": "dcdc",      "label": "USB-A 5V/2.1A", "specs": { "vIn": 12, "vOut": 5, "iLimitA": 2.1, "eff": 0.85 } },
+    { "id": "ub",  "subKind": "dcdc",      "label": "USB-B 5V/2.1A", "specs": { "vIn": 12, "vOut": 5, "iLimitA": 2.1, "eff": 0.85 } },
     { "id": "sw1", "subKind": "switch",    "label": "SW1", "specs": { "ratedA": 20 } },
     { "id": "sw2", "subKind": "switch",    "label": "SW2", "specs": { "ratedA": 20 } },
     { "id": "sw3", "subKind": "switch",    "label": "SW3", "specs": { "ratedA": 20 } },
     { "id": "sw4", "subKind": "switch",    "label": "SW4", "specs": { "ratedA": 20 } },
     { "id": "sw5", "subKind": "switch",    "label": "SW5", "specs": { "ratedA": 20 } },
-    { "id": "sw6", "subKind": "switch",    "label": "SW6", "specs": { "ratedA": 20 } },
-    { "id": "ua",  "subKind": "dcdc",      "label": "USB-A 5V/2.1A", "specs": { "vIn": 12, "vOut": 5, "iLimitA": 2.1, "eff": 0.85 } },
-    { "id": "ub",  "subKind": "dcdc",      "label": "USB-B 5V/2.1A", "specs": { "vIn": 12, "vOut": 5, "iLimitA": 2.1, "eff": 0.85 } },
-    { "id": "vm",  "subKind": "indicator", "label": "Voltmeter",     "specs": { "vRange": "5-30" } }
+    { "id": "sw6", "subKind": "switch",    "label": "SW6", "specs": { "ratedA": 20 } }
   ],
   "internalWiring": [
     { "a": { "external": "in+" }, "b": { "subId": "sw1", "portId": "+" } },
@@ -46,12 +49,12 @@
     { "a": { "external": "in+" }, "b": { "subId": "sw4", "portId": "+" } },
     { "a": { "external": "in+" }, "b": { "subId": "sw5", "portId": "+" } },
     { "a": { "external": "in+" }, "b": { "subId": "sw6", "portId": "+" } },
-    { "a": { "external": "in+" }, "b": { "subId": "ua", "portId": "IN+" } },
-    { "a": { "external": "in+" }, "b": { "subId": "ub", "portId": "IN+" } },
-    { "a": { "external": "in+" }, "b": { "subId": "vm", "portId": "+" } },
-    { "a": { "external": "in-" }, "b": { "subId": "ua", "portId": "IN-" } },
-    { "a": { "external": "in-" }, "b": { "subId": "ub", "portId": "IN-" } },
-    { "a": { "external": "in-" }, "b": { "subId": "vm", "portId": "-" } },
+    { "a": { "external": "in+" }, "b": { "subId": "ua",  "portId": "IN+" } },
+    { "a": { "external": "in+" }, "b": { "subId": "ub",  "portId": "IN+" } },
+    { "a": { "external": "in+" }, "b": { "subId": "vm",  "portId": "+" } },
+    { "a": { "external": "in-" }, "b": { "subId": "ua",  "portId": "IN-" } },
+    { "a": { "external": "in-" }, "b": { "subId": "ub",  "portId": "IN-" } },
+    { "a": { "external": "in-" }, "b": { "subId": "vm",  "portId": "-" } },
     { "a": { "external": "in-" }, "b": { "external": "sw1-" } },
     { "a": { "external": "in-" }, "b": { "external": "sw2-" } },
     { "a": { "external": "in-" }, "b": { "external": "sw3-" } },
@@ -64,10 +67,10 @@
     { "a": { "subId": "sw4", "portId": "-" }, "b": { "external": "sw4+" } },
     { "a": { "subId": "sw5", "portId": "-" }, "b": { "external": "sw5+" } },
     { "a": { "subId": "sw6", "portId": "-" }, "b": { "external": "sw6+" } },
-    { "a": { "subId": "ua", "portId": "OUT+" }, "b": { "external": "usba+" } },
-    { "a": { "subId": "ua", "portId": "OUT-" }, "b": { "external": "usba-" } },
-    { "a": { "subId": "ub", "portId": "OUT+" }, "b": { "external": "usbb+" } },
-    { "a": { "subId": "ub", "portId": "OUT-" }, "b": { "external": "usbb-" } }
+    { "a": { "subId": "ua",  "portId": "OUT+" }, "b": { "external": "usba+" } },
+    { "a": { "subId": "ua",  "portId": "OUT-" }, "b": { "external": "usba-" } },
+    { "a": { "subId": "ub",  "portId": "OUT+" }, "b": { "external": "usbb+" } },
+    { "a": { "subId": "ub",  "portId": "OUT-" }, "b": { "external": "usbb-" } }
   ],
   "qtyOwned": 1,
   "source": {
@@ -76,7 +79,7 @@
     "sellerTitle": "4.2A Dual USB Slot Socket 6 Gang Rocker Switch Panel Digital Voltage Display for Marine Boat Car Rv Vehicles Truck Yacht",
     "seller": "NICEYARD Global Store",
     "priceUSD": 26.5,
-    "images": [],
-    "fetchedAt": "2026-04-23T10:00:00.000Z"
+    "images": ["/components/rocker-panel-6gang-usb-volt/main.jpg"],
+    "fetchedAt": "2026-04-23T11:00:00.000Z"
   }
 }

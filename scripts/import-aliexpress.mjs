@@ -271,7 +271,10 @@ async function scrape(url) {
     locale: 'en-US',
   });
   const page = await ctx.newPage();
-  await page.goto(url, { waitUntil: 'domcontentloaded', timeout: 60000 });
+  await page.goto(url.replace('//he.aliexpress', '//www.aliexpress'), {
+    waitUntil: 'domcontentloaded',
+    timeout: 60000,
+  });
 
   // Detect captcha / login walls.
   const url2 = page.url();
@@ -286,17 +289,21 @@ async function scrape(url) {
 
   const data = await page.evaluate(() => {
     const pickText = (sel) => document.querySelector(sel)?.textContent?.trim() ?? '';
+    // Prefer og:title (server-rendered, stable) over JS-injected DOM.
+    const ogTitle = document.querySelector('meta[property="og:title"]')?.content;
     const title =
+      ogTitle ||
       pickText('[data-pl="product-title"]') ||
       pickText('h1') ||
       document.title;
+    const ogImage = document.querySelector('meta[property="og:image"]')?.content;
     const price =
       pickText('[class*="price--currentPriceText"]') ||
       pickText('[class*="price"]');
     const seller =
       pickText('[class*="store-name"]') ||
       pickText('[class*="seller"]');
-    // Spec table: rows of <dt>/<dd> or <div class="key"><div class="val">.
+    // Spec table.
     const specRows = [];
     document.querySelectorAll('[class*="specification--prop"]').forEach((row) => {
       const k = row.querySelector('[class*="title"]')?.textContent?.trim();
@@ -311,21 +318,22 @@ async function scrape(url) {
         }
       });
     }
-    // Gallery images.
+    // Gallery images. Promote any thumbnail to its full-size variant by stripping
+    // the `_NxN.<ext>` suffix that AliExpress appends.
     const imgs = new Set();
+    if (ogImage) imgs.add(ogImage); // hero image first
     document.querySelectorAll('img').forEach((img) => {
       const src = img.currentSrc || img.src;
       if (!src) return;
       if (!/alicdn|aliexpress/i.test(src)) return;
-      // Filter out tiny thumbnails (.jpg_50x50.webp etc.)
-      if (/_(\d{2,4})x\d{2,4}\.(?:jpg|webp|png)/i.test(src)) {
-        const cleaned = src.replace(/_(?:\d{2,4})x\d{2,4}\.(jpg|webp|png).*/i, '.$1');
+      if (/_(\d{2,4})x\d{2,4}\.(?:jpg|webp|png|jpeg)/i.test(src)) {
+        const cleaned = src.replace(/_(?:\d{2,4})x\d{2,4}\.(jpg|webp|png|jpeg).*/i, '.$1');
         imgs.add(cleaned);
       } else {
         imgs.add(src);
       }
     });
-    return { title, price, seller, specRows, images: [...imgs].slice(0, 5) };
+    return { title, price, seller, specRows, images: [...imgs].slice(0, 8) };
   });
 
   await ctx.close();
@@ -383,6 +391,13 @@ async function main() {
     fetchedAt: new Date().toISOString(),
   };
 
+  // Estimate image aspect ratio so the canvas node matches the photo proportions.
+  // We can't easily probe the image dimensions from Node without an extra dep,
+  // so use a default near-square ratio; the visual-fidelity step (read by Claude)
+  // is expected to refine `size` after inspecting the downloaded image.
+  const imgWidth = 140;
+  const imgHeight = 100;
+
   let json;
   let outPath;
   if (isWire) {
@@ -400,8 +415,10 @@ async function main() {
       id: slug,
       kind,
       name: title,
+      // imageRef points at the LOCAL public/components/<slug>/ image.
+      // The canvas renders this as the node background — see ComponentNode.tsx.
       imageRef: localImagePaths[0],
-      size: { w: 80, h: 60 },
+      size: { w: imgWidth, h: imgHeight },
       ports: defaultPortsFor(kind),
       specs,
       source: sourceRef,

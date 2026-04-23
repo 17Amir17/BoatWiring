@@ -1,0 +1,11 @@
+{
+  "id": "load-nav-led",
+  "kind": "load",
+  "name": "Nav LED 6W",
+  "size": { "w": 70, "h": 70 },
+  "ports": [
+    { "id": "in",  "label": "+", "rel": { "x": 0.30, "y": 1.0 }, "role": "sink" },
+    { "id": "out", "label": "-", "rel": { "x": 0.70, "y": 1.0 }, "role": "sink" }
+  ],
+  "specs": { "wattsOn": 6, "vMin": 10, "vMax": 30, "inrushA": 0.2 }
+}

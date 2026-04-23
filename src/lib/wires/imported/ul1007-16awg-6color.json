@@ -6,11 +6,11 @@
   "insulationColor": "#fbbf24",
   "source": {
     "platform": "aliexpress",
-    "url": "https://www.aliexpress.com/item/1005009223190475.html",
-    "sellerTitle": "6 Colors Mix Kit — UL1007 Wire PVC Insulation Tinned Copper Cable 16 AWG Stranded Electrical Line PCB Wire (16AWG 6×5m)",
+    "url": "https://www.aliexpress.com/item/1005007670999760.html",
+    "sellerTitle": "6 Colors Mix Kit — UL1007 Wire PVC Insulation Tinned Copper Cable 16 AWG (16AWG 6×5m)",
     "seller": "Beteno Connect Store",
     "priceUSD": 23.0,
-    "images": [],
-    "fetchedAt": "2026-04-23T10:00:00.000Z"
+    "images": ["/components/ul1007-16awg-6color/main.jpg"],
+    "fetchedAt": "2026-04-23T11:00:00.000Z"
   }
 }

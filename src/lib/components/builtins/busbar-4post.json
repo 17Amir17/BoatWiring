@@ -1,0 +1,13 @@
+{
+  "id": "busbar-4post",
+  "kind": "busbar",
+  "name": "4-post bus bar",
+  "size": { "w": 140, "h": 50 },
+  "ports": [
+    { "id": "p1", "label": "1", "rel": { "x": 0.125, "y": 1.0 }, "role": "passthrough" },
+    { "id": "p2", "label": "2", "rel": { "x": 0.375, "y": 1.0 }, "role": "passthrough" },
+    { "id": "p3", "label": "3", "rel": { "x": 0.625, "y": 1.0 }, "role": "passthrough" },
+    { "id": "p4", "label": "4", "rel": { "x": 0.875, "y": 1.0 }, "role": "passthrough" }
+  ],
+  "specs": { "ratedA": 250 }
+}

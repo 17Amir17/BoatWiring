@@ -1,0 +1,11 @@
+{
+  "id": "switch-spst-rocker",
+  "kind": "switch",
+  "name": "Rocker SPST",
+  "size": { "w": 80, "h": 50 },
+  "ports": [
+    { "id": "in",  "label": "IN",  "rel": { "x": 0.0, "y": 0.5 }, "role": "passthrough" },
+    { "id": "out", "label": "OUT", "rel": { "x": 1.0, "y": 0.5 }, "role": "passthrough" }
+  ],
+  "specs": { "ratedA": 20, "ratedV": 12 }
+}

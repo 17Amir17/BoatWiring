@@ -1,23 +1,46 @@
 import { memo } from 'react';
 import { Handle, Position, type NodeProps, type Node } from '@xyflow/react';
 import { useAppStore } from '../state/store';
-import type { ComponentDef, ComponentNodeData, Port } from '../types';
+import type { ComponentNodeData, Port } from '../types';
+import { LookalikeBody, STUB, stubLine } from './lookalike';
 
 type ComponentNodeType = Node<ComponentNodeData, 'component'>;
 
-function pickPosition(rel: { x: number; y: number }): Position {
-  if (rel.x <= 0.05) return Position.Left;
-  if (rel.x >= 0.95) return Position.Right;
-  if (rel.y <= 0.05) return Position.Top;
+function pickHandlePosition(rel: { x: number; y: number }): Position {
+  // Decide which edge of the node a handle anchors on, based on which edge it's nearest.
+  const dl = rel.x;
+  const dr = 1 - rel.x;
+  const dt = rel.y;
+  const db = 1 - rel.y;
+  const min = Math.min(dl, dr, dt, db);
+  if (min === dl) return Position.Left;
+  if (min === dr) return Position.Right;
+  if (min === dt) return Position.Top;
   return Position.Bottom;
 }
 
-function PortPin({ port, def }: { port: Port; def: ComponentDef }) {
-  const pos = pickPosition(port.rel);
-  const left = `${port.rel.x * 100}%`;
-  const top = `${port.rel.y * 100}%`;
+function labelOffset(pos: Position): React.CSSProperties {
+  switch (pos) {
+    case Position.Left:   return { left: 14, top: 0, transform: 'translateY(-50%)' };
+    case Position.Right:  return { right: 14, top: 0, transform: 'translateY(-50%)' };
+    case Position.Top:    return { left: 0, top: 14, transform: 'translateX(-50%)' };
+    case Position.Bottom: return { left: 0, bottom: 14, transform: 'translateX(-50%)' };
+  }
+}
+
+function PortPin({
+  port, w, h,
+}: {
+  port: Port;
+  w: number;
+  h: number;
+}) {
+  const pos = pickHandlePosition(port.rel);
+  const px = port.rel.x * w;
+  const py = port.rel.y * h;
   const isPower = port.role === 'source' || port.label === '+';
   const isGround = port.role === 'sink' && (port.label === '-' || port.label.toLowerCase().includes('gnd'));
+  const dotColor = isPower ? '#facc15' : isGround ? '#0f172a' : '#cbd5e1';
   return (
     <>
       <Handle
@@ -25,120 +48,44 @@ function PortPin({ port, def }: { port: Port; def: ComponentDef }) {
         type={isPower ? 'source' : 'target'}
         position={pos}
         style={{
-          left,
-          top,
-          width: 10,
-          height: 10,
-          background: isPower ? '#facc15' : isGround ? '#1f2937' : '#94a3b8',
-          border: '2px solid #0f1115',
-          borderRadius: 6,
+          left: px,
+          top: py,
+          width: 11,
+          height: 11,
+          background: dotColor,
+          border: '2px solid #f8fafc',
+          borderRadius: 8,
+          boxShadow: '0 0 0 1px rgba(0,0,0,0.7)',
+          transform: 'translate(-50%, -50%)',
         }}
       />
       <span
-        className="absolute text-[9px] text-slate-300 select-none pointer-events-none"
+        className="absolute pointer-events-none text-[9px] font-semibold text-slate-100 select-none"
         style={{
-          left,
-          top,
-          transform: pinLabelTransform(pos),
+          left: px,
+          top: py,
+          ...labelOffsetFor(pos, px, py),
+          textShadow: '0 0 3px #0f172a, 0 0 5px #0f172a',
           whiteSpace: 'nowrap',
         }}
       >
         {port.label}
       </span>
-      <span aria-hidden className="hidden">{def.id}</span>
     </>
   );
 }
 
-function pinLabelTransform(pos: Position): string {
+void labelOffset;
+
+function labelOffsetFor(pos: Position, px: number, py: number): React.CSSProperties {
+  void px; void py;
+  // Anchor the label OUTSIDE the body, just past the pin.
   switch (pos) {
-    case Position.Left:   return 'translate(8px, -50%)';
-    case Position.Right:  return 'translate(calc(-100% - 8px), -50%)';
-    case Position.Top:    return 'translate(-50%, 8px)';
-    case Position.Bottom: return 'translate(-50%, calc(-100% - 8px))';
+    case Position.Left:   return { transform: 'translate(10px, -50%)' };
+    case Position.Right:  return { transform: 'translate(calc(-100% - 10px), -50%)' };
+    case Position.Top:    return { transform: 'translate(-50%, 10px)' };
+    case Position.Bottom: return { transform: 'translate(-50%, calc(-100% - 10px))' };
   }
-}
-
-function BatteryOverlay({ id }: { id: string }) {
-  const soc = useAppStore((s) => s.engine.soc[id]);
-  const v = useAppStore((s) => {
-    const def = [...s.componentDefs.values()].find((d) => d.kind === 'battery');
-    void def;
-    // The actual terminal voltage is published per-port; just show SOC here.
-    return soc;
-  });
-  void v;
-  const pct = Math.round((soc ?? 1) * 100);
-  return (
-    <div className="absolute inset-x-1 bottom-1 h-2 rounded bg-slate-700 overflow-hidden">
-      <div
-        className="h-full"
-        style={{
-          width: `${pct}%`,
-          background: pct > 50 ? '#22c55e' : pct > 20 ? '#facc15' : '#ef4444',
-        }}
-      />
-      <span className="absolute inset-0 flex items-center justify-center text-[8px] text-white drop-shadow">
-        {pct}%
-      </span>
-    </div>
-  );
-}
-
-function SwitchLever({ on }: { on: boolean }) {
-  return (
-    <div
-      className={`absolute inset-x-2 top-1/2 -translate-y-1/2 h-3 rounded transition-colors ${
-        on ? 'bg-emerald-400' : 'bg-slate-600'
-      }`}
-    >
-      <div
-        className={`absolute top-1/2 -translate-y-1/2 w-3 h-3 rounded-full bg-slate-100 shadow transition-all ${
-          on ? 'right-0' : 'left-0'
-        }`}
-      />
-    </div>
-  );
-}
-
-function SelectorIndicator({ pos, count }: { pos: number; count: number }) {
-  const angle = (pos / Math.max(count - 1, 1)) * 270 - 135;
-  return (
-    <div className="absolute inset-2 rounded-full border-2 border-slate-600 flex items-center justify-center">
-      <div
-        className="absolute w-0.5 h-1/2 bg-yellow-400 origin-bottom"
-        style={{ top: '5%', transform: `rotate(${angle}deg)` }}
-      />
-      <span className="text-[9px] text-yellow-200 font-mono">{pos}</span>
-    </div>
-  );
-}
-
-function FuseBody({ blown }: { blown: boolean }) {
-  return (
-    <div className={`absolute inset-2 rounded ${blown ? 'bg-red-900/40' : 'bg-amber-700/30'}`}>
-      {blown && (
-        <svg viewBox="0 0 20 20" className="absolute inset-0 w-full h-full text-red-500">
-          <path d="M3 3 L17 17 M17 3 L3 17" stroke="currentColor" strokeWidth="2" />
-        </svg>
-      )}
-    </div>
-  );
-}
-
-function LoadBody({ on, glow }: { on: boolean; glow: number }) {
-  // glow ∈ [0..1] — modulated by current/voltage
-  return (
-    <div
-      className={`absolute inset-2 rounded-full ${on ? 'bg-amber-300' : 'bg-slate-700'}`}
-      style={{
-        boxShadow: on
-          ? `0 0 ${4 + glow * 16}px ${glow * 6}px rgba(252,211,77,${0.4 + glow * 0.4})`
-          : 'none',
-        opacity: on ? 0.5 + glow * 0.5 : 1,
-      }}
-    />
-  );
 }
 
 const ComponentNode = ({ id, data, selected }: NodeProps<ComponentNodeType>) => {
@@ -146,20 +93,14 @@ const ComponentNode = ({ id, data, selected }: NodeProps<ComponentNodeType>) => 
   const toggleSwitch = useAppStore((s) => s.toggleSwitch);
   const setLoadOn = useAppStore((s) => s.setLoadOn);
   const setSelectorPosition = useAppStore((s) => s.setSelectorPosition);
-
-  const portVoltages = useAppStore((s) => s.engine.nodeVoltages);
   const fuseOpen = useAppStore((s) => s.engine.fuseOpen[id]);
 
   if (!def) return <div className="w-8 h-8 bg-red-500/40">missing def</div>;
 
   const w = def.size.w;
   const h = def.size.h;
-
-  // Compute glow: voltage at first port / 12V
-  const v1 = portVoltages[`${id}/${def.ports[0]?.id}`] ?? 0;
-  const v2 = portVoltages[`${id}/${def.ports[1]?.id}`] ?? 0;
-  const dropV = Math.abs(v1 - v2);
-  const glow = Math.min(1, dropV / 12);
+  const bw = Math.max(w - 2 * STUB, 4);
+  const bh = Math.max(h - 2 * STUB, 4);
 
   const onClick = () => {
     if (def.kind === 'switch') toggleSwitch(id);
@@ -173,37 +114,61 @@ const ComponentNode = ({ id, data, selected }: NodeProps<ComponentNodeType>) => 
 
   return (
     <div
-      className={`relative bg-panel-bg border rounded-md shadow-md text-slate-200 ${
-        selected ? 'border-yellow-400' : 'border-panel-border'
-      }`}
+      className="relative"
       style={{ width: w, height: h }}
       onClick={onClick}
     >
-      <div className="absolute inset-x-0 -top-5 text-[10px] text-slate-400 truncate text-center">
-        {def.name}
+      {/* Component name above the body (well outside, so pin labels don't collide) */}
+      <div
+        className="absolute -top-4 left-1/2 -translate-x-1/2 text-[10px] text-slate-300 font-semibold pointer-events-none whitespace-nowrap select-none"
+        style={{ textShadow: '0 0 3px #0f172a' }}
+      >
+        {def.name.length > 28 ? def.name.slice(0, 26) + '…' : def.name}
       </div>
 
-      {def.kind === 'battery' && <BatteryOverlay id={id} />}
-      {def.kind === 'switch' && <SwitchLever on={data.on === true} />}
-      {def.kind === 'selectorSwitch' && def.selector && (
-        <SelectorIndicator
-          pos={data.selectedPosition ?? def.selector.defaultPosition}
-          count={def.selector.positions.length}
+      {/* SVG layer: body + stub lines. Body is INSET by STUB on every side. */}
+      <svg
+        width={w}
+        height={h}
+        className="absolute inset-0 pointer-events-none overflow-visible"
+      >
+        {/* selection / fault outline */}
+        <rect
+          x={STUB - 2} y={STUB - 2}
+          width={bw + 4} height={bh + 4}
+          rx="6"
+          fill="none"
+          stroke={selected ? '#facc15' : 'transparent'}
+          strokeWidth="2"
+          strokeDasharray={selected ? undefined : '3 3'}
         />
-      )}
-      {(def.kind === 'fuse' || def.kind === 'breaker') && (
-        <FuseBody blown={fuseOpen === true} />
-      )}
-      {def.kind === 'load' && <LoadBody on={data.on !== false} glow={glow} />}
+        {/* per-port stub lines, drawn first so the body covers their inner ends */}
+        {def.ports.map((p) => {
+          const ln = stubLine(p.rel, w, h);
+          return (
+            <line
+              key={p.id + '-stub'}
+              x1={ln.x1} y1={ln.y1} x2={ln.x2} y2={ln.y2}
+              stroke="#94a3b8" strokeWidth="1.6" strokeLinecap="round"
+            />
+          );
+        })}
+        {/* body (inset) */}
+        <g transform={`translate(${STUB}, ${STUB})`}>
+          <LookalikeBody def={def} data={data} bw={bw} bh={bh} fuseBlown={fuseOpen === true} />
+        </g>
+      </svg>
 
+      {/* Fault badge */}
       {(data.faults?.length ?? 0) > 0 && (
-        <div className="absolute -top-2 -right-2 px-1 rounded bg-red-600 text-white text-[9px]">
+        <div className="absolute -top-2 -right-2 px-1 rounded bg-red-600 text-white text-[9px] z-10">
           {data.faults.length}⚠
         </div>
       )}
 
+      {/* Pin handles + labels overlay the SVG */}
       {def.ports.map((port) => (
-        <PortPin key={port.id} port={port} def={def} />
+        <PortPin key={port.id} port={port} w={w} h={h} />
       ))}
     </div>
   );

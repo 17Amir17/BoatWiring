@@ -2,10 +2,11 @@
   "id": "ae-underwater-led-blue-ip68-4pc",
   "kind": "load",
   "name": "Underwater Blue LED IP68 (Easybuy 4pc)",
-  "size": { "w": 40, "h": 40 },
+  "imageRef": "/components/underwater-led-blue-ip68-4pc/main.jpeg",
+  "size": { "w": 80, "h": 80 },
   "ports": [
-    { "id": "in",  "label": "+", "rel": { "x": 0.10, "y": 0.5 }, "role": "sink" },
-    { "id": "out", "label": "-", "rel": { "x": 0.90, "y": 0.5 }, "role": "sink" }
+    { "id": "in",  "label": "+", "rel": { "x": 0.30, "y": 1 }, "role": "sink" },
+    { "id": "out", "label": "-", "rel": { "x": 0.70, "y": 1 }, "role": "sink" }
   ],
   "specs": {
     "wattsOn": 3,
@@ -19,11 +20,11 @@
   "qtyOwned": 4,
   "source": {
     "platform": "aliexpress",
-    "url": "https://www.aliexpress.com/item/1005004378369483.html",
+    "url": "https://www.aliexpress.com/item/1005006078251252.html",
     "sellerTitle": "4pcs/set Blue LED Marine Boats Lights Waterproof IP68 Stern Light Underwater Signal Lamp Yacht Side Marker Courtesy Light Parts",
     "seller": "Easybuy Auto Parts Store",
     "priceUSD": 3.4,
-    "images": [],
-    "fetchedAt": "2026-04-23T10:00:00.000Z"
+    "images": ["/components/underwater-led-blue-ip68-4pc/main.jpeg"],
+    "fetchedAt": "2026-04-23T11:00:00.000Z"
   }
 }

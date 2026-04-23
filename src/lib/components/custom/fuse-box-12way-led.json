@@ -2,22 +2,23 @@
   "id": "ae-fuse-box-12way-led",
   "kind": "fuseBlock",
   "name": "12-Way Blade Fuse Box w/ LED Indicators (Shop1104160230)",
-  "size": { "w": 200, "h": 90 },
+  "imageRef": "/components/fuse-box-12way-led/main.jpg",
+  "size": { "w": 180, "h": 180 },
   "ports": [
-    { "id": "in",  "label": "IN+",  "rel": { "x": 0.04, "y": 0.5 }, "role": "passthrough" },
-    { "id": "gnd", "label": "GND",  "rel": { "x": 0.96, "y": 0.5 }, "role": "sink" },
-    { "id": "out1",  "label": "1",  "rel": { "x": 0.18, "y": 0.10 }, "role": "passthrough" },
-    { "id": "out2",  "label": "2",  "rel": { "x": 0.27, "y": 0.10 }, "role": "passthrough" },
-    { "id": "out3",  "label": "3",  "rel": { "x": 0.36, "y": 0.10 }, "role": "passthrough" },
-    { "id": "out4",  "label": "4",  "rel": { "x": 0.45, "y": 0.10 }, "role": "passthrough" },
-    { "id": "out5",  "label": "5",  "rel": { "x": 0.54, "y": 0.10 }, "role": "passthrough" },
-    { "id": "out6",  "label": "6",  "rel": { "x": 0.63, "y": 0.10 }, "role": "passthrough" },
-    { "id": "out7",  "label": "7",  "rel": { "x": 0.18, "y": 0.90 }, "role": "passthrough" },
-    { "id": "out8",  "label": "8",  "rel": { "x": 0.27, "y": 0.90 }, "role": "passthrough" },
-    { "id": "out9",  "label": "9",  "rel": { "x": 0.36, "y": 0.90 }, "role": "passthrough" },
-    { "id": "out10", "label": "10", "rel": { "x": 0.45, "y": 0.90 }, "role": "passthrough" },
-    { "id": "out11", "label": "11", "rel": { "x": 0.54, "y": 0.90 }, "role": "passthrough" },
-    { "id": "out12", "label": "12", "rel": { "x": 0.63, "y": 0.90 }, "role": "passthrough" }
+    { "id": "in",    "label": "IN+", "rel": { "x": 0, "y": 0.05 }, "role": "passthrough" },
+    { "id": "gnd",   "label": "GND", "rel": { "x": 0, "y": 0.95 }, "role": "sink" },
+    { "id": "out1",  "label": "1",   "rel": { "x": 0.10, "y": 0 }, "role": "passthrough" },
+    { "id": "out2",  "label": "2",   "rel": { "x": 0.26, "y": 0 }, "role": "passthrough" },
+    { "id": "out3",  "label": "3",   "rel": { "x": 0.42, "y": 0 }, "role": "passthrough" },
+    { "id": "out4",  "label": "4",   "rel": { "x": 0.58, "y": 0 }, "role": "passthrough" },
+    { "id": "out5",  "label": "5",   "rel": { "x": 0.74, "y": 0 }, "role": "passthrough" },
+    { "id": "out6",  "label": "6",   "rel": { "x": 0.90, "y": 0 }, "role": "passthrough" },
+    { "id": "out7",  "label": "7",   "rel": { "x": 0.10, "y": 1 }, "role": "passthrough" },
+    { "id": "out8",  "label": "8",   "rel": { "x": 0.26, "y": 1 }, "role": "passthrough" },
+    { "id": "out9",  "label": "9",   "rel": { "x": 0.42, "y": 1 }, "role": "passthrough" },
+    { "id": "out10", "label": "10",  "rel": { "x": 0.58, "y": 1 }, "role": "passthrough" },
+    { "id": "out11", "label": "11",  "rel": { "x": 0.74, "y": 1 }, "role": "passthrough" },
+    { "id": "out12", "label": "12",  "rel": { "x": 0.90, "y": 1 }, "role": "passthrough" }
   ],
   "specs": {
     "slots": 12,
@@ -48,7 +49,7 @@
     "sellerTitle": "6-Way or 12-Way Car Boat Blade Fuse Box Block Holder LED Indicator 12V 32V Auto Marine Waterproof Power Distribution Panel Board",
     "seller": "Shop1104160230 Store",
     "priceUSD": 19.0,
-    "images": [],
-    "fetchedAt": "2026-04-23T10:00:00.000Z"
+    "images": ["/components/fuse-box-12way-led/main.jpg"],
+    "fetchedAt": "2026-04-23T11:00:00.000Z"
   }
 }

@@ -1,0 +1,14 @@
+{
+  "id": "connector-butt-splice-16-14",
+  "kind": "connector",
+  "name": "Heat-Shrink Butt Splice 16-14AWG",
+  "size": { "w": 80, "h": 40 },
+  "ports": [
+    { "id": "a", "label": "A", "rel": { "x": 0.0, "y": 0.5 }, "role": "passthrough" },
+    { "id": "b", "label": "B", "rel": { "x": 1.0, "y": 0.5 }, "role": "passthrough" }
+  ],
+  "specs": { "ratedA": 22, "gaugeAWG": 16 },
+  "connectorType": "buttSplice",
+  "wireGaugeRange": [16, 14],
+  "canAttachToWireEnd": false
+}

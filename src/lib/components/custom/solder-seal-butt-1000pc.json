@@ -2,10 +2,11 @@
   "id": "ae-solder-seal-butt-1000pc",
   "kind": "connector",
   "name": "Heat-Shrink Solder Seal Butt Connectors (1000pc, Mini Blocks)",
-  "size": { "w": 28, "h": 12 },
+  "imageRef": "/components/solder-seal-butt-1000pc/main.jpg",
+  "size": { "w": 80, "h": 40 },
   "ports": [
-    { "id": "a", "label": "A", "rel": { "x": 0.05, "y": 0.5 }, "role": "passthrough" },
-    { "id": "b", "label": "B", "rel": { "x": 0.95, "y": 0.5 }, "role": "passthrough" }
+    { "id": "a", "label": "A", "rel": { "x": 0, "y": 0.5 }, "role": "passthrough" },
+    { "id": "b", "label": "B", "rel": { "x": 1, "y": 0.5 }, "role": "passthrough" }
   ],
   "specs": { "ratedA": 22, "gaugeAWG": 16, "kitCount": 1000 },
   "connectorType": "heatShrinkSolder",
@@ -18,7 +19,7 @@
     "sellerTitle": "50-1000pcs Heat Shrink Solder Seal Wire Connectors Kit Waterproof Butt Electrical Terminals Insulated Splice Marine Automotive",
     "seller": "Mini Blocks Toy Store",
     "priceUSD": 18.0,
-    "images": [],
-    "fetchedAt": "2026-04-23T10:00:00.000Z"
+    "images": ["/components/solder-seal-butt-1000pc/main.jpg"],
+    "fetchedAt": "2026-04-23T11:00:00.000Z"
   }
 }

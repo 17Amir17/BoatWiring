@@ -1,8 +1,9 @@
 {
   "id": "ae-heat-shrink-tube-kit-650pc",
   "kind": "accessory",
-  "name": "Heat Shrink Tubing Kit (650pc mixed-size, House Full Of Romance)",
-  "size": { "w": 60, "h": 40 },
+  "name": "Heat Shrink Tubing Kit (650pc, House Full Of Romance)",
+  "imageRef": "/components/heat-shrink-tube-kit-650pc/main.jpg",
+  "size": { "w": 140, "h": 100 },
   "ports": [],
   "specs": { "kitCount": 650, "sizes": "1.6/2.4/3.2/4.8/6.4/9.5/12.7mm" },
   "qtyOwned": 650,
@@ -12,7 +13,7 @@
     "sellerTitle": "Black Heat Shrink Tube Kit Thermoresistant Tubing Shrink Wire Wrapping Electrical Connection Cable Insulation Sleeves Protecter",
     "seller": "House Full Of Romance Store",
     "priceUSD": 7.8,
-    "images": [],
-    "fetchedAt": "2026-04-23T10:00:00.000Z"
+    "images": ["/components/heat-shrink-tube-kit-650pc/main.jpg"],
+    "fetchedAt": "2026-04-23T11:00:00.000Z"
   }
 }

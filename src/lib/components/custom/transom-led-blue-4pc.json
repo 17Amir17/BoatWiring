@@ -1,11 +1,12 @@
 {
-  "id": "ae-transom-led-blue-4pc",
+  "id": "transom-led-blue-4pc",
   "kind": "load",
-  "name": "Boat Transom LED Blue 10-30V (Shop1103277307)",
-  "size": { "w": 40, "h": 40 },
+  "name": "Transom LED Blue Courtesy Light",
+  "imageRef": "/components/transom-led-blue-4pc/main.jpeg",
+  "size": { "w": 80, "h": 80 },
   "ports": [
-    { "id": "in",  "label": "+", "rel": { "x": 0.10, "y": 0.5 }, "role": "sink" },
-    { "id": "out", "label": "-", "rel": { "x": 0.90, "y": 0.5 }, "role": "sink" }
+    { "id": "in", "label": "+", "rel": { "x": 0.30, "y": 1 }, "role": "sink" },
+    { "id": "out", "label": "-", "rel": { "x": 0.70, "y": 1 }, "role": "sink" }
   ],
   "specs": {
     "wattsOn": 1.5,
@@ -15,14 +16,14 @@
     "ip": "IP67",
     "inrushA": 0.2
   },
-  "qtyOwned": 4,
   "source": {
     "platform": "aliexpress",
-    "url": "https://www.aliexpress.com/item/1005006078251252.html",
+    "url": "https://www.aliexpress.com/item/1005007205455178.html",
     "sellerTitle": "4Pcs Boat Transom Light 10-30V Universal Waterproof Marine Boat Underwater Pontoon Transom Lamp 4 LED Blue Courtesy Lights",
     "seller": "Shop1103277307 Store",
     "priceUSD": 5.5,
-    "images": [],
-    "fetchedAt": "2026-04-23T10:00:00.000Z"
-  }
+    "images": ["/components/transom-led-blue-4pc/main.jpeg"],
+    "fetchedAt": "2026-04-23T11:00:00.000Z"
+  },
+  "qtyOwned": 4
 }

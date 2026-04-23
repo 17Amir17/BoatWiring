@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import Canvas from './canvas/Canvas';
 import Palette from './panels/Palette';
 import Inspector from './panels/Inspector';
@@ -7,9 +7,15 @@ import ScenarioPanel from './panels/ScenarioPanel';
 import ComponentEditor from './panels/ComponentEditor';
 import ComponentSandbox from './panels/ComponentSandbox';
 import BillOfMaterials from './panels/BillOfMaterials';
+import ComponentViewer from './panels/ComponentViewer';
 import { useSimLoop } from './state/useSimLoop';
 import { usePersistence } from './state/usePersistence';
 import { useAppStore } from './state/store';
+
+function readViewParam(): string | null {
+  const p = new URLSearchParams(window.location.search);
+  return p.get('view');
+}
 
 export default function App() {
   useSimLoop();
@@ -20,11 +26,36 @@ export default function App() {
   const [editorOpen, setEditorOpen] = useState<{ defId?: string } | null>(null);
   const [sandboxOpen, setSandboxOpen] = useState<string | null>(null);
   const [showBom, setShowBom] = useState(false);
+  const [viewerDefId, setViewerDefId] = useState<string | null>(() => readViewParam());
+
+  useEffect(() => {
+    const onPop = () => setViewerDefId(readViewParam());
+    window.addEventListener('popstate', onPop);
+    return () => window.removeEventListener('popstate', onPop);
+  }, []);
+
+  const closeViewer = () => {
+    setViewerDefId(null);
+    const url = new URL(window.location.href);
+    url.searchParams.delete('view');
+    window.history.replaceState({}, '', url.toString());
+  };
+
+  if (viewerDefId) {
+    return <ComponentViewer defId={viewerDefId} onClose={closeViewer} />;
+  }
 
   const selectedDefId =
     sel.nodeIds.length === 1
       ? nodes.find((n) => n.id === sel.nodeIds[0])?.data.defId
       : undefined;
+
+  const openViewer = (id: string) => {
+    setViewerDefId(id);
+    const url = new URL(window.location.href);
+    url.searchParams.set('view', id);
+    window.history.pushState({}, '', url.toString());
+  };
 
   return (
     <div className="h-screen w-screen flex flex-col">
@@ -44,6 +75,10 @@ export default function App() {
               className="px-2 py-0.5 rounded bg-panel-hover hover:bg-slate-700/40"
               onClick={() => setSandboxOpen(selectedDefId)}
             >sandbox</button>
+            <button
+              className="px-2 py-0.5 rounded bg-yellow-700/40 hover:bg-yellow-700/60 text-yellow-100"
+              onClick={() => openViewer(selectedDefId)}
+            >view (large)</button>
           </>
         )}
         <button
