@@ -33,10 +33,12 @@ interface BodyProps {
   /** Net current flowing OUT of each port of THIS component, keyed by port id.
    *  Positive = leaving the component (sourcing), negative = entering (sinking). */
   portCurrents?: Record<string, number>;
+  /** Battery state-of-charge (0..1). Only meaningful for kind='battery'. */
+  soc?: number;
 }
 
-function BatteryBody({ bw, bh, data, portCurrents }: BodyProps) {
-  const soc = typeof data.soc === 'number' ? Math.max(0, Math.min(1, data.soc)) : 1;
+function BatteryBody({ bw, bh, portVoltages, portCurrents, soc: socProp }: BodyProps) {
+  const soc = typeof socProp === 'number' ? Math.max(0, Math.min(1, socProp)) : 1;
   const iPos = portCurrents?.['pos'] ?? 0;
   const sourcing = iPos > 0.05;
   const charging = iPos < -0.05;
@@ -47,6 +49,9 @@ function BatteryBody({ bw, bh, data, portCurrents }: BodyProps) {
       : '0.0 A';
   const ampsColor = sourcing ? '#dc2626' : charging ? '#16a34a' : '#475569';
   const socColor = soc > 0.5 ? '#22c55e' : soc > 0.2 ? '#facc15' : '#ef4444';
+  const vPos = portVoltages?.['pos'] ?? 0;
+  const vNeg = portVoltages?.['neg'] ?? 0;
+  const vTerminal = Math.max(0, vPos - vNeg);
   const barX = bw * 0.10;
   const barY = bh * 0.14;
   const barW = bw * 0.80;
@@ -67,7 +72,7 @@ function BatteryBody({ bw, bh, data, portCurrents }: BodyProps) {
       <text x={bw * 0.25} y={bh * 0.42} textAnchor="middle" fill="#1e293b" fontSize="10">−</text>
       <text x={bw * 0.75} y={bh * 0.42} textAnchor="middle" fill="#dc2626" fontSize="10">+</text>
       <text x={bw / 2} y={bh * 0.65} textAnchor="middle"
-            fill="#0f172a" fontSize="11" fontWeight="600">12 V</text>
+            fill="#0f172a" fontSize="11" fontWeight="600">{vTerminal.toFixed(1)} V</text>
       <text x={bw / 2} y={bh * 0.85} textAnchor="middle"
             fill={ampsColor} fontSize="10" fontWeight="700"
             fontFamily="ui-monospace, monospace">{ampsLabel}</text>
@@ -165,21 +170,31 @@ function SelectorBody({ bw, bh, def, data }: BodyProps) {
   );
 }
 
-function isEnergized(def: ComponentDef, data: ComponentNodeData, portVoltages?: Record<string, number>) {
+function isEnergized(
+  def: ComponentDef,
+  data: ComponentNodeData,
+  portVoltages?: Record<string, number>,
+  portCurrents?: Record<string, number>,
+) {
   const on = data.on !== false;
+  if (!on) return false;
   const vMin = num(def.specs.vMin, 8);
   const vIn = portVoltages?.['in'] ?? portVoltages?.['+'] ?? 0;
   const vOut = portVoltages?.['out'] ?? portVoltages?.['-'] ?? 0;
   const drop = Math.abs(vIn - vOut);
   // Match the solver's soft-brownout: load is "lit" once drop reaches the
-  // bottom of the 1V brownout window (vMin - 1). Below that the solver itself
-  // ramps the load to zero. Without this slop a load that was solving at e.g.
-  // 4.45V (just below a 4.5V vMin from DCDC droop + wire loss) would draw
-  // current in sim but render dark visually.
-  return on && drop >= vMin - 1;
+  // bottom of the 1V brownout window (vMin - 1).
+  if (drop < vMin - 1) return false;
+  // Voltage alone isn't enough — a tiny load wired in series with a
+  // brownout-opened high-vMin load gets the full source voltage but no
+  // current. A real load wouldn't actually emit/run, so the visual must
+  // reflect that. 5 mA threshold matches the inspector's near-zero rounding.
+  const iIn  = Math.abs(portCurrents?.['in']  ?? portCurrents?.['+'] ?? 0);
+  const iOut = Math.abs(portCurrents?.['out'] ?? portCurrents?.['-'] ?? 0);
+  return Math.max(iIn, iOut) >= 0.005;
 }
 
-function GenericLoadBody({ bw, bh, def, data, portVoltages }: BodyProps) {
+function GenericLoadBody({ bw, bh, def, data, portVoltages, portCurrents }: BodyProps) {
   // data.chromaticity (per-node override) wins over def.specs.chromaticity.
   const tint = str((data as { chromaticity?: unknown }).chromaticity, str(def.specs.chromaticity, 'amber'));
   const colors: Record<string, [string, string]> = {
@@ -189,7 +204,7 @@ function GenericLoadBody({ bw, bh, def, data, portVoltages }: BodyProps) {
     white:  ['#f8fafc', '#e2e8f0'],
     amber:  ['#fbbf24', '#92400e'],
   };
-  const energized = isEnergized(def, data, portVoltages);
+  const energized = isEnergized(def, data, portVoltages, portCurrents);
   const r = Math.min(bw, bh) * 0.42;
   const cx = bw / 2;
   const cy = bh / 2;
@@ -250,8 +265,8 @@ function GenericLoadBody({ bw, bh, def, data, portVoltages }: BodyProps) {
   );
 }
 
-function UnderwaterLedBody({ bw, bh, def, data, portVoltages }: BodyProps) {
-  const energized = isEnergized(def, data, portVoltages);
+function UnderwaterLedBody({ bw, bh, def, data, portVoltages, portCurrents }: BodyProps) {
+  const energized = isEnergized(def, data, portVoltages, portCurrents);
   const cx = bw / 2;
   const cy = bh / 2;
   const rOuter = Math.min(bw, bh) * 0.46;
@@ -283,8 +298,8 @@ function UnderwaterLedBody({ bw, bh, def, data, portVoltages }: BodyProps) {
   );
 }
 
-function HornBody({ bw, bh, def, data, portVoltages }: BodyProps) {
-  const energized = isEnergized(def, data, portVoltages);
+function HornBody({ bw, bh, def, data, portVoltages, portCurrents }: BodyProps) {
+  const energized = isEnergized(def, data, portVoltages, portCurrents);
   const bracketW = bw * 0.12;
   const bracketH = bh * 0.50;
   const bracketY = (bh - bracketH) / 2;
@@ -331,8 +346,8 @@ function HornBody({ bw, bh, def, data, portVoltages }: BodyProps) {
   );
 }
 
-function BilgePumpBody({ bw, bh, def, data, portVoltages }: BodyProps) {
-  const energized = isEnergized(def, data, portVoltages);
+function BilgePumpBody({ bw, bh, def, data, portVoltages, portCurrents }: BodyProps) {
+  const energized = isEnergized(def, data, portVoltages, portCurrents);
   const bodyX = bw * 0.18;
   const bodyW = bw * 0.50;
   const bodyTopY = bh * 0.22;
@@ -568,16 +583,42 @@ function DcdcBody({ bw, bh, def }: BodyProps) {
   );
 }
 
-function IndicatorBody({ bw, bh }: BodyProps) {
+function IndicatorBody({ bw, bh, def, portVoltages, portCurrents }: BodyProps) {
+  const ports = def.ports;
+  const meterType = str(def.specs.meterType, 'voltmeter');
+  const isAmmeter = meterType === 'ammeter';
+  let value: number;
+  let lit: boolean;
+  let unit: string;
+  if (isAmmeter) {
+    // Current magnitude through the meter — net current at port 0 (signs
+    // cancel between in/out so |port0|).
+    const i = Math.abs(portCurrents?.[ports[0]?.id] ?? 0);
+    value = i;
+    lit = i >= 0.01;
+    unit = 'A';
+  } else {
+    const vPlus = portVoltages?.[ports[0]?.id] ?? 0;
+    const vMinus = portVoltages?.[ports[1]?.id] ?? 0;
+    value = Math.max(0, vPlus - vMinus);
+    lit = value > 4;
+    unit = 'V';
+  }
+  const display = lit ? value.toFixed(value < 10 ? 2 : 1) : '--.-';
   return (
     <g>
       <rect x="0" y="0" width={bw} height={bh}
             rx="3" fill="#0f172a" stroke="#475569" strokeWidth="1.5" />
       <rect x={bw * 0.10} y={bh * 0.20} width={bw * 0.80} height={bh * 0.60}
-            rx="2" fill="#1f2937" stroke="#22c55e" />
-      <text x={bw / 2} y={bh * 0.62} textAnchor="middle"
-            fill="#22c55e" fontSize="11" fontWeight="700"
-            fontFamily="ui-monospace, monospace">12.6</text>
+            rx="2" fill="#1f2937" stroke={lit ? '#22c55e' : '#475569'} />
+      <text x={bw / 2} y={bh * 0.58} textAnchor="middle"
+            fill={lit ? '#22c55e' : '#1f2937'}
+            fontSize={Math.min(bh * 0.40, 16)} fontWeight="700"
+            fontFamily="ui-monospace, monospace">{display}</text>
+      <text x={bw / 2} y={bh * 0.92} textAnchor="middle"
+            fill="#64748b" fontSize={Math.max(7, bh * 0.16)} fontWeight="700">
+        DC {unit}
+      </text>
     </g>
   );
 }

@@ -1,0 +1,18 @@
+{
+  "id": "indicator-ammeter-panel",
+  "kind": "indicator",
+  "name": "Panel Ammeter (DC 0-30A)",
+  "size": { "w": 90, "h": 60 },
+  "ports": [
+    { "id": "in",  "label": "+", "rel": { "x": 0.0, "y": 0.5 }, "role": "passthrough" },
+    { "id": "out", "label": "-", "rel": { "x": 1.0, "y": 0.5 }, "role": "passthrough" }
+  ],
+  "specs": {
+    "iRange": "0-30",
+    "meterType": "ammeter",
+    "displayUnit": "A",
+    "accuracy": "+/- 0.1A",
+    "shuntResistance": "1mOhm"
+  },
+  "description": "Stand-alone panel-mount DC ammeter, 0-30A range. Wires in SERIES with the load (current flows through it). Internal shunt resistance ~1mΩ so it doesn't disturb the circuit it measures."
+}

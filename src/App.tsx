@@ -12,6 +12,51 @@ import { useSimLoop } from './state/useSimLoop';
 import { usePersistence } from './state/usePersistence';
 import { useAppStore } from './state/store';
 import { BOAT_DEMO_NODES, BOAT_DEMO_EDGES } from './lib/demos/boatDemo';
+import { loadLocal } from './lib/storage/schematic';
+
+type RfHandle = {
+  setNodes: (n: unknown) => void;
+  setEdges: (e: unknown) => void;
+  updateNodeInternals: (id: string) => void;
+};
+
+function loadBoatDemo() {
+  // React Flow's controlled-mode edge renderer only draws edges to nodes
+  // that exist in its INTERNAL nodeLookup — which it populates from its
+  // own state mutations, not from external Zustand setState. So we go
+  // through the React Flow instance's setNodes/setEdges, which feed
+  // through RF's reconciler. Then we mirror to the Zustand store so the
+  // rest of the app (Inspector, simulator, persistence) sees the data.
+  const defs = useAppStore.getState().componentDefs;
+  const nodes = BOAT_DEMO_NODES.map((n) => {
+    const def = defs.get(n.data.defId);
+    const size = def?.size ?? { w: 100, h: 60 };
+    return {
+      ...n,
+      measured: { width: size.w, height: size.h },
+      width: size.w,
+      height: size.h,
+    };
+  });
+  const edges = [...BOAT_DEMO_EDGES];
+  const rf = (window as unknown as { rf?: RfHandle }).rf;
+  if (rf) {
+    // Stage 1: push nodes through RF only. DON'T mirror to the Zustand
+    // store yet — that triggers Canvas to re-render with the controlled
+    // `nodes` prop, which makes RF reconcile and lose its handle bounds.
+    rf.setNodes(nodes);
+    // Stage 2 (after 600 ms): handles have mounted + RF's internal
+    // ResizeObserver has populated handleBounds for every node. Now
+    // push edges. THEN mirror both to the Zustand store atomically so
+    // the rest of the app sees them.
+    setTimeout(() => {
+      rf.setEdges(edges);
+      useAppStore.setState({ nodes, edges });
+    }, 600);
+  } else {
+    useAppStore.setState({ nodes, edges });
+  }
+}
 
 function readViewParam(): string | null {
   const p = new URLSearchParams(window.location.search);
@@ -33,6 +78,29 @@ export default function App() {
     const onPop = () => setViewerDefId(readViewParam());
     window.addEventListener('popstate', onPop);
     return () => window.removeEventListener('popstate', onPop);
+  }, []);
+
+  // On first launch (no saved schematic), populate the canvas with the boat
+  // demo so the app has something meaningful on screen. Runs after
+  // usePersistence has had a chance to hydrate and polls until React Flow's
+  // instance is mounted (loadBoatDemo needs window.rf for its two-stage load).
+  useEffect(() => {
+    if (loadLocal()) return;
+    let cancelled = false;
+    const tryLoad = () => {
+      if (cancelled) return;
+      if (useAppStore.getState().nodes.length > 0) return;
+      if (!(window as unknown as { rf?: unknown }).rf) {
+        setTimeout(tryLoad, 50);
+        return;
+      }
+      loadBoatDemo();
+    };
+    const t = setTimeout(tryLoad, 0);
+    return () => {
+      cancelled = true;
+      clearTimeout(t);
+    };
   }, []);
 
   const closeViewer = () => {
@@ -84,43 +152,7 @@ export default function App() {
         )}
         <button
           className="ml-auto px-2 py-0.5 rounded bg-emerald-100 hover:bg-emerald-200 text-emerald-800"
-          onClick={() => {
-            // React Flow's controlled-mode edge renderer only draws edges to nodes
-            // that exist in its INTERNAL nodeLookup — which it populates from its
-            // own state mutations, not from external Zustand setState. So we go
-            // through the React Flow instance's setNodes/setEdges, which feed
-            // through RF's reconciler. Then we mirror to the Zustand store so the
-            // rest of the app (Inspector, simulator, persistence) sees the data.
-            const defs = useAppStore.getState().componentDefs;
-            const nodes = BOAT_DEMO_NODES.map((n) => {
-              const def = defs.get(n.data.defId);
-              const size = def?.size ?? { w: 100, h: 60 };
-              return {
-                ...n,
-                measured: { width: size.w, height: size.h },
-                width: size.w,
-                height: size.h,
-              };
-            });
-            const edges = [...BOAT_DEMO_EDGES];
-            const rf = (window as unknown as { rf?: { setNodes: (n: unknown) => void; setEdges: (e: unknown) => void; updateNodeInternals: (id: string) => void } }).rf;
-            if (rf) {
-              // Stage 1: push nodes through RF only. DON'T mirror to the Zustand
-              // store yet — that triggers Canvas to re-render with the controlled
-              // `nodes` prop, which makes RF reconcile and lose its handle bounds.
-              rf.setNodes(nodes);
-              // Stage 2 (after 600 ms): handles have mounted + RF's internal
-              // ResizeObserver has populated handleBounds for every node. Now
-              // push edges. THEN mirror both to the Zustand store atomically so
-              // the rest of the app sees them.
-              setTimeout(() => {
-                rf.setEdges(edges);
-                useAppStore.setState({ nodes, edges });
-              }, 600);
-            } else {
-              useAppStore.setState({ nodes, edges });
-            }
-          }}
+          onClick={loadBoatDemo}
           title="Load the schematic from sketch.txt"
         >load boat demo</button>
         <button

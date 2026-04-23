@@ -1,0 +1,18 @@
+{
+  "id": "indicator-voltmeter-panel",
+  "kind": "indicator",
+  "name": "Panel Voltmeter (DC 0-30V)",
+  "size": { "w": 90, "h": 60 },
+  "ports": [
+    { "id": "+", "label": "+", "rel": { "x": 0.0, "y": 0.5 }, "role": "sink" },
+    { "id": "-", "label": "-", "rel": { "x": 1.0, "y": 0.5 }, "role": "sink" }
+  ],
+  "specs": {
+    "vRange": "0-30",
+    "meterType": "voltmeter",
+    "displayUnit": "V",
+    "accuracy": "+/- 0.1V",
+    "internalResistance": "1MOhm"
+  },
+  "description": "Stand-alone panel-mount DC voltmeter, 0-30V range, displays terminal voltage. Wires across the load you want to measure (in PARALLEL). Draws negligible current."
+}

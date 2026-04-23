@@ -493,14 +493,21 @@ function stampComponent(
       break;
     }
     case 'indicator': {
-      // Voltmeter / LED display draws negligible current; stamp 100kΩ to ground from + to –.
       if (def.ports.length >= 2) {
+        const meterType = typeof def.specs.meterType === 'string' ? def.specs.meterType : 'voltmeter';
+        // Voltmeter wires across (parallel) — high impedance shunt.
+        // Ammeter wires in series — low-impedance pass-through (~1mΩ shunt).
+        const rOhm = meterType === 'ammeter' ? 0.001 : 100_000;
+        const rid = `R_IND_${n.id}`;
         ctx.resistors.push({
-          id: `R_IND_${n.id}`,
+          id: rid,
           a: port(def.ports[0].id),
           b: port(def.ports[1].id),
-          rOhm: 100_000,
+          rOhm,
         });
+        // For an ammeter, register the resistor as the node's "primary" so we
+        // can read its current later for the display.
+        if (meterType === 'ammeter') ctx.addPrimary(n.id, rid);
       }
       break;
     }
@@ -596,6 +603,18 @@ function stampSubComponent(
           inExternalNeg = a.external; break;
         }
       }
+      // Also locate OUT+/OUT- externals to recover last-step output current
+      // from the terminal voltage sag across the Thevenin.
+      let outExternalPos: string | null = null;
+      let outExternalNeg: string | null = null;
+      for (const w of parentDef.internalWiring ?? []) {
+        const a = w.a as { subId?: string; portId?: string; external?: string };
+        const b = w.b as { subId?: string; portId?: string; external?: string };
+        if (a.subId === sub.id && a.portId === 'OUT+' && typeof b.external === 'string') outExternalPos = b.external;
+        else if (b.subId === sub.id && b.portId === 'OUT+' && typeof a.external === 'string') outExternalPos = a.external;
+        if (a.subId === sub.id && a.portId === 'OUT-' && typeof b.external === 'string') outExternalNeg = b.external;
+        else if (b.subId === sub.id && b.portId === 'OUT-' && typeof a.external === 'string') outExternalNeg = a.external;
+      }
       const vIn = inExternal ? (input.prevPortVoltages?.[`${n.id}/${inExternal}`] ?? 0) : 0;
       const vInNeg = inExternalNeg ? (input.prevPortVoltages?.[`${n.id}/${inExternalNeg}`] ?? 0) : 0;
       const inDrop = Math.abs(vIn - vInNeg);
@@ -609,18 +628,36 @@ function stampSubComponent(
         vVolts: effectiveVOut,
         rIntOhm: enabled ? rOut : 1e6,
       });
-      // The DCDC's input draw should TRACK its output draw, not be a fixed
-      // ceiling. Model a small idle/quiescent input draw (~0.05A at vIn)
-      // when enabled — actual load current flows naturally through the
-      // vSource. Without this small load the DCDC acts as a free voltage
-      // source; with the old fixed iLimit-based load it FOUGHT the output
-      // load (constant-power-load oscillation).
+      // Treat the DCDC as a non-isolated buck (the common case for USB-charger
+      // and cig-outlet ICs). Bond IN- to OUT- with a tiny resistor so the
+      // output ground rides with the input ground; without this the vSource
+      // floats and the solver splits the output drop symmetrically around 0
+      // (e.g. USB+ = +2.5 V, USB- = -2.5 V instead of +5 V / 0 V).
+      ctx.resistors.push({
+        id: `R_DCDC_GND_${n.id}_${sub.id}`,
+        a: subPort(ports[1]),
+        b: subPort(ports[3] ?? ports[1]),
+        rOhm: 0.001,
+      });
+      // The DCDC output is an ideal Thevenin — without a matching input-side
+      // load the converter would manufacture energy. Recover last-step output
+      // current from the terminal voltage sag across rOut
+      // (iOut = (vOut - vOutTerminal) / rOut) and stamp an input pLoad equal
+      // to vOut·iOut/eff + a small idle draw. The one-step lag is negligible
+      // at 10 Hz and avoids the constant-power coupling that previously
+      // caused output/input to fight each other.
+      const vOutPos = outExternalPos ? (input.prevPortVoltages?.[`${n.id}/${outExternalPos}`] ?? vOut) : vOut;
+      const vOutNeg = outExternalNeg ? (input.prevPortVoltages?.[`${n.id}/${outExternalNeg}`] ?? 0) : 0;
+      const iOutPrev = enabled
+        ? Math.max(0, Math.min(iLimit, (vOut - (vOutPos - vOutNeg)) / Math.max(rOut, 1e-6)))
+        : 0;
       const idleW = enabled ? Math.min(0.6, (vOut * 0.05) / Math.max(eff, 0.5)) : 0;
+      const drawW = enabled ? (vOut * iOutPrev) / Math.max(eff, 0.5) + idleW : 0;
       ctx.pLoads.push({
         id: `PL_SUB_DCDC_${n.id}_${sub.id}`,
         a: subPort(ports[0]),
         b: subPort(ports[1]),
-        watts: idleW,
+        watts: drawW,
         vMin: vMinIn,
       });
       break;

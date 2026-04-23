@@ -172,7 +172,7 @@ export function initialState(): EngineState {
     fuseI2T: {},
     tSec: 0,
     timeScale: 1,
-    running: false,
+    running: true,
   };
 }
 

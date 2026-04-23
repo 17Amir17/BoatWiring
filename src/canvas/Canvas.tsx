@@ -1,4 +1,4 @@
-import { useCallback, useMemo, useRef } from 'react';
+import { useCallback, useMemo, useRef, useState } from 'react';
 import {
   Background,
   ConnectionMode,
@@ -13,7 +13,7 @@ import { useAppStore, type BoatNode, type BoatEdge } from '../state/store';
 import ComponentNode from './ComponentNode';
 import WireEdge from './WireEdge';
 import EdgeOverlay from './EdgeOverlay';
-import { routeEdges } from './router';
+import { routeEdges, type EdgeRoute } from './router';
 import { EdgeRoutesContext } from './EdgeRoutesContext';
 
 const nodeTypes = { component: ComponentNode };
@@ -59,7 +59,13 @@ function CanvasInner() {
   );
 
   const componentDefs = useAppStore((s) => s.componentDefs);
+  // While the user is dragging a node we hold the previously-computed routes
+  // steady — running the A* router every cursor tick drops frame rate. As soon
+  // as the drag ends we recompute against the new node positions.
+  const [isDragging, setIsDragging] = useState(false);
+  const lastRoutesRef = useRef<Map<string, EdgeRoute>>(new Map());
   const routes = useMemo(() => {
+    if (isDragging) return lastRoutesRef.current;
     const portPos = (nodeId: string, handleId: string | null) => {
       const n = nodes.find((nn) => nn.id === nodeId);
       if (!n || !handleId) return null;
@@ -71,8 +77,10 @@ function CanvasInner() {
       const h = n.measured?.height ?? n.height ?? def.size.h;
       return { x: n.position.x + port.rel.x * w, y: n.position.y + port.rel.y * h };
     };
-    return routeEdges(edges, nodes, portPos);
-  }, [edges, nodes, componentDefs]);
+    const r = routeEdges(edges, nodes, portPos);
+    lastRoutesRef.current = r;
+    return r;
+  }, [edges, nodes, componentDefs, isDragging]);
   return (
     <div className="w-full h-full" onDrop={onDrop} onDragOver={onDragOver}>
       <EdgeRoutesContext.Provider value={routes}>
@@ -85,6 +93,10 @@ function CanvasInner() {
           onEdgesChange={onEdgesChange}
           onConnect={handleConnect}
           onSelectionChange={onSelectionChange}
+          onNodeDragStart={() => setIsDragging(true)}
+          onNodeDragStop={() => setIsDragging(false)}
+          onSelectionDragStart={() => setIsDragging(true)}
+          onSelectionDragStop={() => setIsDragging(false)}
           onInit={(inst) => {
             rfRef.current = inst;
             // Expose for programmatic loaders (e.g. "load boat demo") so they can

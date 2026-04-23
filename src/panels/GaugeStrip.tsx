@@ -5,6 +5,9 @@ export default function GaugeStrip() {
   const nodeVoltages = useAppStore((s) => s.engine.nodeVoltages);
   const edgeCurrents = useAppStore((s) => s.engine.edgeCurrents);
   const tSec = useAppStore((s) => s.engine.tSec);
+  const nodes = useAppStore((s) => s.nodes);
+  const edges = useAppStore((s) => s.edges);
+  const defs = useAppStore((s) => s.componentDefs);
 
   const battEntries = Object.entries(soc);
   const avgSoc = battEntries.length
@@ -15,15 +18,28 @@ export default function GaugeStrip() {
   const vs = Object.entries(nodeVoltages).filter(([k, v]) => k.endsWith('/pos') && v > 6);
   const busV = vs.length ? vs.reduce((a, [, v]) => a + v, 0) / vs.length : 0;
 
-  const totalAmps = Object.values(edgeCurrents).reduce(
-    (a, v) => a + Math.abs(v),
-    0,
-  );
+  // Total battery current: sum |I| of edges leaving a battery's + terminal (or
+  // arriving at a battery's - terminal). Avoids double-counting serial branches
+  // the way a naive sum over all edges would (a single amp flowing through a
+  // chain of N wires would show up as N amps).
+  let battAmps = 0;
+  for (const n of nodes) {
+    const def = defs.get(n.data.defId);
+    if (def?.kind !== 'battery') continue;
+    const posPort = def.ports.find((p) => p.label === '+' || p.role === 'source')?.id;
+    for (const e of edges) {
+      if (e.source === n.id && e.sourceHandle === posPort) {
+        battAmps += Math.abs(edgeCurrents[e.id] ?? 0);
+      } else if (e.target === n.id && e.targetHandle === posPort) {
+        battAmps += Math.abs(edgeCurrents[e.id] ?? 0);
+      }
+    }
+  }
 
   return (
     <div className="flex items-center gap-6 px-4 h-9 bg-panel-bg border-b border-panel-border text-xs">
       <Stat label="Bus" value={`${busV.toFixed(2)} V`} />
-      <Stat label="Σ |I|" value={`${totalAmps.toFixed(2)} A`} />
+      <Stat label="I batt" value={`${battAmps.toFixed(2)} A`} />
       <Stat label="SOC" value={`${(avgSoc * 100).toFixed(0)} %`} />
       <Stat label="t" value={fmtTime(tSec)} />
     </div>

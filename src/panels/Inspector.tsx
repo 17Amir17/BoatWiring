@@ -54,10 +54,30 @@ export default function Inspector() {
               )}
               {def.ports.map((p) => {
                 const v = portVoltages[`${node.id}/${p.id}`];
+                // Net current OUT of this port = sum over incident edges
+                // (positive when this node is the edge's source on this handle,
+                // negative when target on this handle).
+                let i = 0;
+                let touched = false;
+                for (const e of edges) {
+                  const cur = edgeCurrents[e.id];
+                  if (cur === undefined) continue;
+                  if (e.source === node.id && e.sourceHandle === p.id) { i += cur; touched = true; }
+                  if (e.target === node.id && e.targetHandle === p.id) { i -= cur; touched = true; }
+                }
+                const ia = Math.abs(i);
+                const iColor = !touched ? 'text-slate-400'
+                  : ia < 0.005 ? 'text-slate-500'
+                  : i > 0 ? 'text-orange-600' : 'text-blue-600';
                 return (
-                  <div key={p.id} className="flex justify-between text-slate-700">
-                    <span>{p.label}</span>
-                    <span className="font-mono">{v !== undefined ? `${v.toFixed(2)} V` : '—'}</span>
+                  <div key={p.id} className="flex justify-between items-baseline text-slate-700 gap-2">
+                    <span className="shrink-0">{p.label}</span>
+                    <span className="font-mono text-right tabular-nums">
+                      {v !== undefined ? `${v.toFixed(2)} V` : '—'}
+                    </span>
+                    <span className={`font-mono text-right tabular-nums shrink-0 w-16 ${iColor}`}>
+                      {touched ? `${ia.toFixed(2)} A${ia >= 0.005 ? (i > 0 ? ' →' : ' ←') : ''}` : '—'}
+                    </span>
                   </div>
                 );
               })}
