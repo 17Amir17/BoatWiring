@@ -51,6 +51,10 @@ export interface BuildInput {
   soc: Record<string, number>;
   /** Whether each fuse node id has been blown by i²t. */
   fuseOpen: Record<string, boolean>;
+  /** Previous step's per-port voltages (componentId/portId → V). Used for
+   *  conditional sources like DCDC: if input voltage is below a threshold,
+   *  output is disabled this step. */
+  prevPortVoltages?: Record<string, number>;
 }
 
 export interface BuildOutput {
@@ -562,21 +566,62 @@ function stampSubComponent(
       const vOut = num(sub.specs.vOut, 5);
       const iLimit = num(sub.specs.iLimitA, 2.1);
       const eff = num(sub.specs.eff, 0.9);
+      const vMinIn = num(sub.specs.vMinIn, 6);
       const rOut = (vOut * 0.1) / Math.max(iLimit, 0.001);
+      // The DCDC's IN+/IN- are internal sub-ports wired to external ports of
+      // the parent composite via internalWiring. Walk the wiring to find which
+      // external port feeds this sub's IN+, then check last step's voltage at
+      // that external port. If below vMinIn, disable the output (vOut = 0).
+      // Without this, a DCDC outputs full voltage even when its input bus is
+      // dead (e.g. battery disconnect open).
+      let inExternal: string | null = null;
+      for (const w of parentDef.internalWiring ?? []) {
+        const a = w.a as { subId?: string; portId?: string; external?: string };
+        const b = w.b as { subId?: string; portId?: string; external?: string };
+        if (a.subId === sub.id && a.portId === 'IN+' && typeof b.external === 'string') {
+          inExternal = b.external; break;
+        }
+        if (b.subId === sub.id && b.portId === 'IN+' && typeof a.external === 'string') {
+          inExternal = a.external; break;
+        }
+      }
+      let inExternalNeg: string | null = null;
+      for (const w of parentDef.internalWiring ?? []) {
+        const a = w.a as { subId?: string; portId?: string; external?: string };
+        const b = w.b as { subId?: string; portId?: string; external?: string };
+        if (a.subId === sub.id && a.portId === 'IN-' && typeof b.external === 'string') {
+          inExternalNeg = b.external; break;
+        }
+        if (b.subId === sub.id && b.portId === 'IN-' && typeof a.external === 'string') {
+          inExternalNeg = a.external; break;
+        }
+      }
+      const vIn = inExternal ? (input.prevPortVoltages?.[`${n.id}/${inExternal}`] ?? 0) : 0;
+      const vInNeg = inExternalNeg ? (input.prevPortVoltages?.[`${n.id}/${inExternalNeg}`] ?? 0) : 0;
+      const inDrop = Math.abs(vIn - vInNeg);
+      const enabled = inExternal === null || inDrop >= vMinIn;
+      const effectiveVOut = enabled ? vOut : 0;
       const sid = `V_SUB_DCDC_${n.id}_${sub.id}`;
       ctx.vSources.push({
         id: sid,
         pos: subPort(ports[2] ?? ports[0]),
         neg: subPort(ports[3] ?? ports[1]),
-        vVolts: vOut,
-        rIntOhm: rOut,
+        vVolts: effectiveVOut,
+        rIntOhm: enabled ? rOut : 1e6,
       });
+      // The DCDC's input draw should TRACK its output draw, not be a fixed
+      // ceiling. Model a small idle/quiescent input draw (~0.05A at vIn)
+      // when enabled — actual load current flows naturally through the
+      // vSource. Without this small load the DCDC acts as a free voltage
+      // source; with the old fixed iLimit-based load it FOUGHT the output
+      // load (constant-power-load oscillation).
+      const idleW = enabled ? Math.min(0.6, (vOut * 0.05) / Math.max(eff, 0.5)) : 0;
       ctx.pLoads.push({
         id: `PL_SUB_DCDC_${n.id}_${sub.id}`,
         a: subPort(ports[0]),
         b: subPort(ports[1]),
-        watts: (vOut * iLimit) / Math.max(eff, 0.5),
-        vMin: 6,
+        watts: idleW,
+        vMin: vMinIn,
       });
       break;
     }

@@ -225,7 +225,7 @@ export function solve(circuit: Circuit): Solution | null {
 
   let last: Solution | null = null;
   let converged = pLoads.length === 0;
-  for (let iter = 0; iter < 12; iter++) {
+  for (let iter = 0; iter < 60; iter++) {
     const sol = solveOnce(circuit, sys, pLoads);
     if (!sol) return null;
     last = sol;
@@ -238,11 +238,20 @@ export function solve(circuit: Circuit): Solution | null {
       const va = sol.voltages.get(p.stamp.a) ?? 0;
       const vb = sol.voltages.get(p.stamp.b) ?? 0;
       const v = Math.abs(va - vb);
-      const newR = v <= (p.stamp.vMin ?? 0)
+      const vMin = p.stamp.vMin ?? 0;
+      // Soft brownout: at v >= vMin the load runs at full power; below vMin
+      // it ramps down linearly to zero over a 1V window. This avoids the
+      // hard 1e10 discontinuity that previously caused the relaxation to
+      // oscillate around the vMin boundary and leave R stuck at ~10^7 Ω.
+      const lo = Math.max(0, vMin - 1);
+      const factor = v >= vMin ? 1
+        : v <= lo ? 0
+        : (v - lo) / Math.max(vMin - lo, 1e-6);
+      const newR = factor < 0.001
         ? 1e10
-        : Math.max((v * v) / Math.max(p.stamp.watts, 1e-6), p.stamp.rMinOhm ?? 1e-3);
+        : Math.max((v * v) / Math.max(p.stamp.watts * factor, 1e-6), p.stamp.rMinOhm ?? 1e-3);
       maxDelta = Math.max(maxDelta, Math.abs(newR - p.rOhm) / Math.max(newR, 1e-6));
-      p.rOhm = p.rOhm + 0.6 * (newR - p.rOhm);
+      p.rOhm = p.rOhm + 0.4 * (newR - p.rOhm);
     }
     if (maxDelta < 1e-3) {
       converged = true;

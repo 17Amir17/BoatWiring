@@ -171,7 +171,12 @@ function isEnergized(def: ComponentDef, data: ComponentNodeData, portVoltages?: 
   const vIn = portVoltages?.['in'] ?? portVoltages?.['+'] ?? 0;
   const vOut = portVoltages?.['out'] ?? portVoltages?.['-'] ?? 0;
   const drop = Math.abs(vIn - vOut);
-  return on && drop >= vMin;
+  // Match the solver's soft-brownout: load is "lit" once drop reaches the
+  // bottom of the 1V brownout window (vMin - 1). Below that the solver itself
+  // ramps the load to zero. Without this slop a load that was solving at e.g.
+  // 4.45V (just below a 4.5V vMin from DCDC droop + wire loss) would draw
+  // current in sim but render dark visually.
+  return on && drop >= vMin - 1;
 }
 
 function GenericLoadBody({ bw, bh, def, data, portVoltages }: BodyProps) {

@@ -55,6 +55,7 @@ export function step(input: StepInputs): StepResult {
     edges: input.edges,
     soc: input.state.soc,
     fuseOpen: input.state.fuseOpen,
+    prevPortVoltages: input.state.nodeVoltages,
   });
   const sol = solve(built.circuit) ?? {
     voltages: new Map(),
