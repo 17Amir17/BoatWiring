@@ -44,6 +44,7 @@ interface AppState {
   removeNode: (id: string) => void;
   removeEdge: (id: string) => void;
   toggleSwitch: (nodeId: string) => void;
+  toggleSubSwitch: (nodeId: string, subId: string) => void;
   setSelectorPosition: (nodeId: string, idx: number) => void;
   setLoadOn: (nodeId: string, on: boolean) => void;
   injectFault: (target: { kind: 'node' | 'edge'; id: string }, fault: Fault) => void;
@@ -72,8 +73,14 @@ const builtIn = () => {
   return { defs, wires };
 };
 
+// Expose the store on window during dev so the chrome MCP can probe state.
+declare global { interface Window { useAppStore?: unknown } }
+
 export const useAppStore = create<AppState>((set, get) => {
   const { defs, wires } = builtIn();
+  if (typeof window !== 'undefined') {
+    setTimeout(() => { window.useAppStore = useAppStore; }, 0);
+  }
   return {
     componentDefs: defs,
     wireDefs: wires,
@@ -157,6 +164,24 @@ export const useAppStore = create<AppState>((set, get) => {
         nodes: s.nodes.map((n) =>
           n.id === id ? { ...n, data: { ...n.data, on: !n.data.on } } : n,
         ),
+      })),
+
+    toggleSubSwitch: (id, subId) =>
+      set((s) => ({
+        nodes: s.nodes.map((n) => {
+          if (n.id !== id) return n;
+          const subStates = ((n.data as ComponentNodeData & {
+            subStates?: Record<string, { on?: boolean }>;
+          }).subStates) ?? {};
+          const cur = subStates[subId]?.on === true;
+          return {
+            ...n,
+            data: {
+              ...n.data,
+              subStates: { ...subStates, [subId]: { ...subStates[subId], on: !cur } },
+            } as ComponentNodeData,
+          };
+        }),
       })),
 
     setSelectorPosition: (id, idx) =>

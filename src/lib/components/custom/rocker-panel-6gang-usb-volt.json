@@ -3,23 +3,23 @@
   "kind": "composite",
   "name": "6-Gang Rocker Panel + 4.2A USB + Voltmeter + 12V Cig Outlet (NICEYARD)",
   "imageRef": "/components/rocker-panel-6gang-usb-volt/main.jpg",
-  "size": { "w": 320, "h": 220 },
+  "size": { "w": 360, "h": 240 },
   "ports": [
-    { "id": "in+",   "label": "IN+", "rel": { "x": 0,    "y": 0.30 }, "role": "source" },
-    { "id": "in-",   "label": "IN-", "rel": { "x": 0,    "y": 0.70 }, "role": "sink" },
+    { "id": "ip1",     "label": "1in",  "rel": { "x": 0,    "y": 0.10 }, "role": "sink" },
+    { "id": "ip2",     "label": "2in",  "rel": { "x": 0,    "y": 0.20 }, "role": "sink" },
+    { "id": "ip3",     "label": "3in",  "rel": { "x": 0,    "y": 0.30 }, "role": "sink" },
+    { "id": "ip4",     "label": "4in",  "rel": { "x": 0,    "y": 0.40 }, "role": "sink" },
+    { "id": "ip5",     "label": "5in",  "rel": { "x": 0,    "y": 0.50 }, "role": "sink" },
+    { "id": "ip6",     "label": "6in",  "rel": { "x": 0,    "y": 0.60 }, "role": "sink" },
+    { "id": "accIn+",  "label": "Acc+", "rel": { "x": 0,    "y": 0.78 }, "role": "sink" },
+    { "id": "in-",     "label": "GND",  "rel": { "x": 0,    "y": 0.92 }, "role": "sink" },
 
-    { "id": "sw1+",  "label": "1+",  "rel": { "x": 0.13, "y": 1.0 },  "role": "source" },
-    { "id": "sw1-",  "label": "1-",  "rel": { "x": 0.20, "y": 1.0 },  "role": "sink" },
-    { "id": "sw2+",  "label": "2+",  "rel": { "x": 0.27, "y": 1.0 },  "role": "source" },
-    { "id": "sw2-",  "label": "2-",  "rel": { "x": 0.34, "y": 1.0 },  "role": "sink" },
-    { "id": "sw3+",  "label": "3+",  "rel": { "x": 0.41, "y": 1.0 },  "role": "source" },
-    { "id": "sw3-",  "label": "3-",  "rel": { "x": 0.48, "y": 1.0 },  "role": "sink" },
-    { "id": "sw4+",  "label": "4+",  "rel": { "x": 0.55, "y": 1.0 },  "role": "source" },
-    { "id": "sw4-",  "label": "4-",  "rel": { "x": 0.62, "y": 1.0 },  "role": "sink" },
-    { "id": "sw5+",  "label": "5+",  "rel": { "x": 0.69, "y": 1.0 },  "role": "source" },
-    { "id": "sw5-",  "label": "5-",  "rel": { "x": 0.76, "y": 1.0 },  "role": "sink" },
-    { "id": "sw6+",  "label": "6+",  "rel": { "x": 0.83, "y": 1.0 },  "role": "source" },
-    { "id": "sw6-",  "label": "6-",  "rel": { "x": 0.90, "y": 1.0 },  "role": "sink" },
+    { "id": "sw1+",  "label": "1",  "rel": { "x": 0.16, "y": 1.0 },  "role": "source" },
+    { "id": "sw2+",  "label": "2",  "rel": { "x": 0.30, "y": 1.0 },  "role": "source" },
+    { "id": "sw3+",  "label": "3",  "rel": { "x": 0.44, "y": 1.0 },  "role": "source" },
+    { "id": "sw4+",  "label": "4",  "rel": { "x": 0.58, "y": 1.0 },  "role": "source" },
+    { "id": "sw5+",  "label": "5",  "rel": { "x": 0.72, "y": 1.0 },  "role": "source" },
+    { "id": "sw6+",  "label": "6",  "rel": { "x": 0.86, "y": 1.0 },  "role": "source" },
 
     { "id": "usba+", "label": "Ua+", "rel": { "x": 1.0,  "y": 0.20 }, "role": "source" },
     { "id": "usba-", "label": "Ua-", "rel": { "x": 1.0,  "y": 0.35 }, "role": "sink" },
@@ -27,7 +27,7 @@
     { "id": "usbb-", "label": "Ub-", "rel": { "x": 1.0,  "y": 0.70 }, "role": "sink" },
 
     { "id": "cig+",  "label": "Cig+", "rel": { "x": 1.0, "y": 0.85 }, "role": "source" },
-    { "id": "cig-",  "label": "Cig-", "rel": { "x": 1.0, "y": 0.92 }, "role": "sink" }
+    { "id": "cig-",  "label": "Cig-", "rel": { "x": 1.0, "y": 0.95 }, "role": "sink" }
   ],
   "specs": {
     "switchRatedA": 20,
@@ -41,6 +41,7 @@
     "switchType": "rocker, illuminated (blue/green/red LED)",
     "panelMaterial": "ABS plastic, marine-grade",
     "operatingVoltage": "12V/24V DC",
+    "wiringNote": "Each rocker switch's POSITIVE input is exposed separately (ip1..ip6) — there is no factory bridge between them, so each circuit can be individually fused upstream. swN+ is the SWITCHED OUTPUT to the load. The single in- pin is the panel-wide GROUND used only for (a) the LED illumination inside each rocker switch, (b) the voltmeter, (c) the USB chargers, and (d) the cigarette outlet. Load returns DO NOT come back through the panel — each load's negative wires straight back to the boat's ground (the fuse-box per-circuit GND screw).",
     "_raw_item_diameter": "13",
     "_raw_item_weight": "430",
     "_raw_item_height": "12",
@@ -48,9 +49,9 @@
     "_raw_item_length": "20",
     "_raw_external_testing_certification": "ce"
   },
-  "description": "Marine/RV rocker switch panel combining 6 illuminated 20A rocker switches, dual-port 4.2A USB charger (2x 2.1A @ 5V), digital voltmeter (5-30V), and a 12V cigarette lighter / accessory socket on a single ABS waterproof plate. Pre-wired internally so installation only requires connecting IN+/IN- to the battery bus and one OUT pair per circuit.",
+  "description": "Marine/RV rocker switch panel: 6 illuminated 20A rocker switches, dual-port 4.2A USB charger (2x 2.1A @ 5V), digital voltmeter (5-30V), and a 12V cigarette / accessory socket on a single ABS plate. In this sim each gang is wired with an INDEPENDENT power input (ip1..ip6) so you can put a separate fuse upstream of every switch; the voltmeter, USB chargers and cig outlet share a common accessory feed (accIn+).",
   "packageContents": [
-    "1x 6-gang rocker switch panel (with USB, voltmeter, and 12V cigarette outlet pre-installed)"
+    "1x 6-gang rocker switch panel (USB, voltmeter, and 12V cigarette outlet pre-installed)"
   ],
   "gallery": [
     "https://ae01.alicdn.com/kf/S89bd5c353bf14759ac77f682e9a9fcee9.jpg"
@@ -68,32 +69,29 @@
     { "id": "sw6", "subKind": "switch",    "label": "SW6", "specs": { "ratedA": 20 } }
   ],
   "internalWiring": [
-    { "a": { "external": "in+" }, "b": { "subId": "sw1", "portId": "+" } },
-    { "a": { "external": "in+" }, "b": { "subId": "sw2", "portId": "+" } },
-    { "a": { "external": "in+" }, "b": { "subId": "sw3", "portId": "+" } },
-    { "a": { "external": "in+" }, "b": { "subId": "sw4", "portId": "+" } },
-    { "a": { "external": "in+" }, "b": { "subId": "sw5", "portId": "+" } },
-    { "a": { "external": "in+" }, "b": { "subId": "sw6", "portId": "+" } },
-    { "a": { "external": "in+" }, "b": { "subId": "ua",  "portId": "IN+" } },
-    { "a": { "external": "in+" }, "b": { "subId": "ub",  "portId": "IN+" } },
-    { "a": { "external": "in+" }, "b": { "subId": "vm",  "portId": "+" } },
-    { "a": { "external": "in+" }, "b": { "subId": "cig", "portId": "IN+" } },
-    { "a": { "external": "in-" }, "b": { "subId": "ua",  "portId": "IN-" } },
-    { "a": { "external": "in-" }, "b": { "subId": "ub",  "portId": "IN-" } },
-    { "a": { "external": "in-" }, "b": { "subId": "vm",  "portId": "-" } },
-    { "a": { "external": "in-" }, "b": { "subId": "cig", "portId": "IN-" } },
-    { "a": { "external": "in-" }, "b": { "external": "sw1-" } },
-    { "a": { "external": "in-" }, "b": { "external": "sw2-" } },
-    { "a": { "external": "in-" }, "b": { "external": "sw3-" } },
-    { "a": { "external": "in-" }, "b": { "external": "sw4-" } },
-    { "a": { "external": "in-" }, "b": { "external": "sw5-" } },
-    { "a": { "external": "in-" }, "b": { "external": "sw6-" } },
+    { "a": { "external": "ip1" }, "b": { "subId": "sw1", "portId": "+" } },
+    { "a": { "external": "ip2" }, "b": { "subId": "sw2", "portId": "+" } },
+    { "a": { "external": "ip3" }, "b": { "subId": "sw3", "portId": "+" } },
+    { "a": { "external": "ip4" }, "b": { "subId": "sw4", "portId": "+" } },
+    { "a": { "external": "ip5" }, "b": { "subId": "sw5", "portId": "+" } },
+    { "a": { "external": "ip6" }, "b": { "subId": "sw6", "portId": "+" } },
+
     { "a": { "subId": "sw1", "portId": "-" }, "b": { "external": "sw1+" } },
     { "a": { "subId": "sw2", "portId": "-" }, "b": { "external": "sw2+" } },
     { "a": { "subId": "sw3", "portId": "-" }, "b": { "external": "sw3+" } },
     { "a": { "subId": "sw4", "portId": "-" }, "b": { "external": "sw4+" } },
     { "a": { "subId": "sw5", "portId": "-" }, "b": { "external": "sw5+" } },
     { "a": { "subId": "sw6", "portId": "-" }, "b": { "external": "sw6+" } },
+
+    { "a": { "external": "accIn+" }, "b": { "subId": "ua",  "portId": "IN+" } },
+    { "a": { "external": "accIn+" }, "b": { "subId": "ub",  "portId": "IN+" } },
+    { "a": { "external": "accIn+" }, "b": { "subId": "vm",  "portId": "+" } },
+    { "a": { "external": "accIn+" }, "b": { "subId": "cig", "portId": "IN+" } },
+    { "a": { "external": "in-" },    "b": { "subId": "ua",  "portId": "IN-" } },
+    { "a": { "external": "in-" },    "b": { "subId": "ub",  "portId": "IN-" } },
+    { "a": { "external": "in-" },    "b": { "subId": "vm",  "portId": "-" } },
+    { "a": { "external": "in-" },    "b": { "subId": "cig", "portId": "IN-" } },
+
     { "a": { "subId": "ua",  "portId": "OUT+" }, "b": { "external": "usba+" } },
     { "a": { "subId": "ua",  "portId": "OUT-" }, "b": { "external": "usba-" } },
     { "a": { "subId": "ub",  "portId": "OUT+" }, "b": { "external": "usbb+" } },

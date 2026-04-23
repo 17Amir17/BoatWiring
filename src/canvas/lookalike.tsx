@@ -26,6 +26,10 @@ interface BodyProps {
   bw: number; // body width (node width - 2*STUB)
   bh: number;
   fuseBlown?: boolean;
+  onSubSwitchClick?: (subId: string) => void;
+  /** Voltage at each port of THIS component, keyed by port id. Used to drive
+   *  live overlays like the voltmeter inside a composite panel. */
+  portVoltages?: Record<string, number>;
 }
 
 function BatteryBody({ bw, bh }: BodyProps) {
@@ -135,17 +139,23 @@ function SelectorBody({ bw, bh, def, data }: BodyProps) {
   );
 }
 
-function LoadBody({ bw, bh, def, data }: BodyProps) {
+function LoadBody({ bw, bh, def, data, portVoltages }: BodyProps) {
   const on = data.on !== false;
   const tint = str(def.specs.chromaticity, 'amber');
   const colors: Record<string, [string, string]> = {
-    blue:   ['#bfdbfe', '#60a5fa'],
-    red:    ['#fecaca', '#ef4444'],
-    green:  ['#bbf7d0', '#22c55e'],
+    blue:   ['#3b82f6', '#1e3a8a'],
+    red:    ['#ef4444', '#7f1d1d'],
+    green:  ['#22c55e', '#14532d'],
     white:  ['#f8fafc', '#e2e8f0'],
-    amber:  ['#fde68a', '#f59e0b'],
+    amber:  ['#fbbf24', '#92400e'],
   };
   const [bright, dim] = colors[tint] ?? colors.amber;
+  // Energized = on AND has voltage above the load's vMin
+  const vMin = num(def.specs.vMin, 8);
+  const vIn = portVoltages?.['in'] ?? portVoltages?.['+'] ?? 0;
+  const vOut = portVoltages?.['out'] ?? portVoltages?.['-'] ?? 0;
+  const drop = Math.abs(vIn - vOut);
+  const energized = on && drop >= vMin;
   const r = Math.min(bw, bh) * 0.42;
   return (
     <g>
@@ -153,9 +163,25 @@ function LoadBody({ bw, bh, def, data }: BodyProps) {
             rx={Math.min(bw, bh) * 0.5}
             fill="#1e293b" stroke="#475569" strokeWidth="1.2" />
       <circle cx={bw / 2} cy={bh / 2} r={r}
-              fill={on ? bright : dim}
-              filter={on ? 'drop-shadow(0 0 4px rgba(255,255,255,0.6))' : undefined} />
-      {on && <circle cx={bw / 2} cy={bh / 2} r={r * 0.6} fill="white" fillOpacity="0.5" />}
+              fill={energized ? bright : dim}
+              filter={energized
+                ? `drop-shadow(0 0 8px ${bright}) drop-shadow(0 0 16px ${bright})`
+                : undefined} />
+      {energized && (
+        <>
+          <circle cx={bw / 2} cy={bh / 2} r={r * 0.55} fill="white" fillOpacity="0.7" />
+          <circle cx={bw / 2 - r * 0.2} cy={bh / 2 - r * 0.2} r={r * 0.18}
+                  fill="white" fillOpacity="0.95" />
+        </>
+      )}
+      {/* Visible "ON" badge */}
+      {energized && (
+        <text x={bw / 2} y={bh - 3} textAnchor="middle"
+              fill="#22c55e" fontSize={Math.max(7, bh * 0.15)}
+              fontWeight="700" fontFamily="ui-sans-serif, system-ui">
+          ●
+        </text>
+      )}
     </g>
   );
 }
@@ -285,7 +311,7 @@ function IndicatorBody({ bw, bh }: BodyProps) {
   );
 }
 
-function CompositeBody({ bw, bh, def, data }: BodyProps) {
+function CompositeBody({ bw, bh, def, data, onSubSwitchClick, portVoltages }: BodyProps) {
   const subs = def.subComponents ?? [];
   const switches = subs.filter((s) => s.subKind === 'switch');
   const dcdcs = subs.filter((s) => s.subKind === 'dcdc');
@@ -293,10 +319,12 @@ function CompositeBody({ bw, bh, def, data }: BodyProps) {
   const fuses = subs.filter((s) => s.subKind === 'fuse');
   const subStates = (data as ComponentNodeData & { subStates?: Record<string, { on?: boolean }> })
     .subStates ?? {};
+  void dcdcs;
 
-  // Marine rocker panel layout: top row = indicators + USB sockets (centered), bottom row = switches.
+  // Marine rocker panel layout: voltmeter LCD on top, rocker switches on bottom.
+  // USB/cig converter electronics are internal — only their handles render on the
+  // right edge of the node, no on-face boxes needed.
   if (switches.length >= 3) {
-    const topItems = [...indicators, ...dcdcs];
     const topY = bh * 0.10;
     const topH = bh * 0.32;
     const swY = bh * 0.55;
@@ -311,42 +339,45 @@ function CompositeBody({ bw, bh, def, data }: BodyProps) {
           <circle key={i} cx={bw * fx} cy={bh * fy} r={1.6}
                   fill="#475569" stroke="#94a3b8" strokeWidth="0.6" />
         ))}
-        {/* top row: voltmeter + USB sockets */}
-        {topItems.map((s, i) => {
-          const slotW = (bw * 0.90) / Math.max(topItems.length, 1);
-          const x = bw * 0.05 + i * slotW;
-          if (s.subKind === 'indicator') {
-            return (
-              <g key={s.id}>
-                <rect x={x + 4} y={topY} width={slotW - 8} height={topH}
-                      rx="3" fill="#1f2937" stroke="#22c55e" />
-                <text x={x + slotW / 2} y={topY + topH * 0.65} textAnchor="middle"
-                      fill="#22c55e" fontSize={Math.min(topH * 0.55, 12)}
-                      fontWeight="700"
-                      fontFamily="ui-monospace, monospace">12.6</text>
-              </g>
-            );
-          }
-          // dcdc -> USB socket
+        {/* top: voltmeter LCD (centered, full width) */}
+        {indicators.length > 0 && (() => {
+          const vAcc = portVoltages?.['accIn+'] ?? portVoltages?.['in+'] ?? 0;
+          const vNeg = portVoltages?.['in-'] ?? 0;
+          const v = Math.max(0, vAcc - vNeg);
+          const lit = v > 4;
+          const w = bw * 0.40;
+          const x = (bw - w) / 2;
           return (
-            <g key={s.id}>
-              <rect x={x + 4} y={topY} width={slotW - 8} height={topH}
-                    rx="3" fill="#0f172a" stroke="#475569" />
-              <rect x={x + slotW * 0.25} y={topY + topH * 0.30}
-                    width={slotW * 0.50} height={topH * 0.40}
-                    rx="1.5" fill="#475569" stroke="#cbd5e1" />
-              <text x={x + slotW / 2} y={topY + topH * 0.95} textAnchor="middle"
-                    fill="#94a3b8" fontSize="6">USB</text>
+            <g key="vm">
+              <rect x={x} y={topY} width={w} height={topH}
+                    rx="3" fill="#0a0a0a"
+                    stroke={lit ? '#22c55e' : '#475569'} strokeWidth={lit ? 1.5 : 1} />
+              <text x={bw / 2} y={topY + topH * 0.70} textAnchor="middle"
+                    fill={lit ? '#22c55e' : '#1f2937'}
+                    fontSize={Math.min(topH * 0.55, 16)}
+                    fontWeight="700"
+                    fontFamily="ui-monospace, monospace">
+                {lit ? v.toFixed(1) : '--.-'}
+              </text>
             </g>
           );
-        })}
-        {/* bottom row: rocker switches */}
+        })()}
+        {/* bottom row: rocker switches — each clickable to toggle that gang */}
         {switches.map((s, i) => {
           const slotW = (bw * 0.90) / switches.length;
           const x = bw * 0.05 + i * slotW;
           const on = subStates[s.id]?.on === true;
           return (
-            <g key={s.id}>
+            <g
+              key={s.id}
+              className="nodrag nopan"
+              style={{ cursor: 'pointer', pointerEvents: 'auto' }}
+              onPointerDown={(e) => e.stopPropagation()}
+              onClick={(e) => {
+                e.stopPropagation();
+                onSubSwitchClick?.(s.id);
+              }}
+            >
               <rect x={x + 2} y={swY} width={slotW - 4} height={swH}
                     rx="3" fill="#1f2937" stroke="#475569" />
               <rect x={x + slotW * 0.25} y={swY + swH * 0.20}
@@ -358,6 +389,9 @@ function CompositeBody({ bw, bh, def, data }: BodyProps) {
               <rect x={x + slotW * 0.25} y={swY + swH * 0.55}
                     width={slotW * 0.50} height={swH * 0.30}
                     rx="2" fill="#1e293b" stroke="#64748b" strokeWidth="0.6" />
+              {/* invisible larger hit area for easier clicking */}
+              <rect x={x + 2} y={swY} width={slotW - 4} height={swH}
+                    fill="transparent" />
             </g>
           );
         })}

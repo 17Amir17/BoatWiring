@@ -1,0 +1,11 @@
+{
+  "id": "load-usb-phone",
+  "kind": "load",
+  "name": "USB Phone Charging (5V 2A)",
+  "size": { "w": 70, "h": 70 },
+  "ports": [
+    { "id": "in",  "label": "+", "rel": { "x": 0.30, "y": 1.0 }, "role": "sink" },
+    { "id": "out", "label": "-", "rel": { "x": 0.70, "y": 1.0 }, "role": "sink" }
+  ],
+  "specs": { "wattsOn": 10, "vMin": 4.5, "vMax": 5.5, "inrushA": 2 }
+}

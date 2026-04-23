@@ -1,6 +1,7 @@
-import { useCallback, useRef } from 'react';
+import { useCallback, useMemo, useRef } from 'react';
 import {
   Background,
+  ConnectionMode,
   Controls,
   ReactFlow,
   ReactFlowProvider,
@@ -11,6 +12,9 @@ import {
 import { useAppStore, type BoatNode, type BoatEdge } from '../state/store';
 import ComponentNode from './ComponentNode';
 import WireEdge from './WireEdge';
+import EdgeOverlay from './EdgeOverlay';
+import { routeEdges } from './router';
+import { EdgeRoutesContext } from './EdgeRoutesContext';
 
 const nodeTypes = { component: ComponentNode };
 const edgeTypes = { wire: WireEdge };
@@ -54,29 +58,55 @@ function CanvasInner() {
     [onConnect],
   );
 
+  const componentDefs = useAppStore((s) => s.componentDefs);
+  const routes = useMemo(() => {
+    const portPos = (nodeId: string, handleId: string | null) => {
+      const n = nodes.find((nn) => nn.id === nodeId);
+      if (!n || !handleId) return null;
+      const def = componentDefs.get(n.data.defId);
+      if (!def) return null;
+      const port = def.ports.find((p) => p.id === handleId);
+      if (!port) return null;
+      const w = n.measured?.width ?? n.width ?? def.size.w;
+      const h = n.measured?.height ?? n.height ?? def.size.h;
+      return { x: n.position.x + port.rel.x * w, y: n.position.y + port.rel.y * h };
+    };
+    return routeEdges(edges, nodes, portPos);
+  }, [edges, nodes, componentDefs]);
   return (
     <div className="w-full h-full" onDrop={onDrop} onDragOver={onDragOver}>
-      <ReactFlow
-        nodes={nodes}
-        edges={edges}
-        nodeTypes={nodeTypes}
-        edgeTypes={edgeTypes}
-        onNodesChange={onNodesChange}
-        onEdgesChange={onEdgesChange}
-        onConnect={handleConnect}
-        onSelectionChange={onSelectionChange}
-        onInit={(inst) => {
-          rfRef.current = inst;
-        }}
-        defaultEdgeOptions={{ type: 'wire' }}
-        fitView
-        proOptions={{ hideAttribution: true }}
-        snapToGrid
-        snapGrid={[8, 8]}
-      >
-        <Background gap={16} color="#e2e8f0" />
-        <Controls />
-      </ReactFlow>
+      <EdgeRoutesContext.Provider value={routes}>
+        <ReactFlow
+          nodes={nodes}
+          edges={edges}
+          nodeTypes={nodeTypes}
+          edgeTypes={edgeTypes}
+          onNodesChange={onNodesChange}
+          onEdgesChange={onEdgesChange}
+          onConnect={handleConnect}
+          onSelectionChange={onSelectionChange}
+          onInit={(inst) => {
+            rfRef.current = inst;
+            // Expose for programmatic loaders (e.g. "load boat demo") so they can
+            // go through React Flow's internal reconciliation instead of just
+            // mutating the store and hoping RF picks it up.
+            (window as unknown as { rf?: typeof inst }).rf = inst;
+          }}
+          defaultEdgeOptions={{ type: 'wire' }}
+          // Loose connection mode lets target-type handles also act as sources, which
+          // is what we want for passthrough ports (fuse, switch, busbar, etc. — pins
+          // that conduct in either direction depending on the circuit).
+          connectionMode={ConnectionMode.Loose}
+          fitView
+          proOptions={{ hideAttribution: true }}
+          snapToGrid
+          snapGrid={[8, 8]}
+        >
+          <Background gap={16} color="#e2e8f0" />
+          <Controls />
+          <EdgeOverlay />
+        </ReactFlow>
+      </EdgeRoutesContext.Provider>
     </div>
   );
 }

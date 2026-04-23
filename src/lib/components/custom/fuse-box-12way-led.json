@@ -6,7 +6,7 @@
   "size": { "w": 220, "h": 220 },
   "ports": [
     { "id": "in",       "label": "IN+",      "rel": { "x": 0,    "y": 0.05 }, "role": "passthrough" },
-    { "id": "main_gnd", "label": "MAIN GND", "rel": { "x": 1,    "y": 0.95 }, "role": "sink" },
+    { "id": "main_gnd", "label": "MAIN GND", "rel": { "x": 0,    "y": 0.95 }, "role": "sink" },
 
     { "id": "out1",  "label": "1",  "rel": { "x": 0.15, "y": 0 }, "role": "passthrough" },
     { "id": "out2",  "label": "2",  "rel": { "x": 0.27, "y": 0 }, "role": "passthrough" },
@@ -32,7 +32,7 @@
     { "id": "gnd9",  "label": "G9",  "rel": { "x": 1, "y": 0.69 }, "role": "sink" },
     { "id": "gnd10", "label": "G10", "rel": { "x": 1, "y": 0.77 }, "role": "sink" },
     { "id": "gnd11", "label": "G11", "rel": { "x": 1, "y": 0.85 }, "role": "sink" },
-    { "id": "gnd12", "label": "G12", "rel": { "x": 0,  "y": 0.95 }, "role": "sink" }
+    { "id": "gnd12", "label": "G12", "rel": { "x": 1,  "y": 0.95 }, "role": "sink" }
   ],
   "specs": {
     "slots": 12,

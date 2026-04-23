@@ -1,0 +1,11 @@
+{
+  "id": "load-12v-air-pump",
+  "kind": "load",
+  "name": "12V Inflator (cig plug, 80W)",
+  "size": { "w": 80, "h": 80 },
+  "ports": [
+    { "id": "in",  "label": "+", "rel": { "x": 0.30, "y": 1.0 }, "role": "sink" },
+    { "id": "out", "label": "-", "rel": { "x": 0.70, "y": 1.0 }, "role": "sink" }
+  ],
+  "specs": { "wattsOn": 80, "vMin": 10, "vMax": 14, "inrushA": 8 }
+}

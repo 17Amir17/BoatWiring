@@ -2,6 +2,7 @@ import type {
   ComponentDef,
   ComponentNodeData,
   Fault,
+  Port,
   SubComponent,
   WireData,
   WireDef,
@@ -363,18 +364,27 @@ function stampComponent(
       break;
     }
     case 'fuseBlock': {
-      // Common-in bus connects to all OUT slots through a fuse each.
-      // Slot fuses live as subComponents; if absent, treat as direct passthrough.
+      // Two internal buses:
+      //   - positive bus: IN+ stud feeds N fuses, each fuse output goes to its OUT terminal
+      //   - ground  bus: MAIN GND stud and every per-circuit gndN screw are all bonded
+      //                  together (real fuse blocks have a copper bar tying them all).
+      // Without the ground bonding, return-current paths float and loads see no closed
+      // loop through the fuse box's GND taps.
+      const lowerLabel = (p: Port) => p.label.toLowerCase();
+      const isGroundPort = (p: Port) =>
+        p.role === 'sink' &&
+        (lowerLabel(p).includes('gnd') || lowerLabel(p).startsWith('g') || p.label === '-');
       const inPort = def.ports.find((p) => p.label.toLowerCase().startsWith('in'))
         ?? def.ports[0];
-      const outPorts = def.ports.filter((p) => p !== inPort && p.role !== 'sink');
-      const groundPort = def.ports.find((p) => p.label.toLowerCase().includes('gnd')
-        || p.label === '-');
-      const bus = `${n.id}/__bus__`;
+      const outPorts = def.ports.filter((p) => p !== inPort && !isGroundPort(p));
+      const groundPorts = def.ports.filter(isGroundPort);
+
+      // --- Positive bus + per-slot fuses ---
+      const posBus = `${n.id}/__bus__`;
       ctx.resistors.push({
         id: `R_FB_IN_${n.id}`,
         a: port(inPort.id),
-        b: bus,
+        b: posBus,
         rOhm: R_BUSBAR,
       });
       const subs = def.subComponents ?? [];
@@ -385,21 +395,29 @@ function stampComponent(
           const subBlown = input.fuseOpen[`${n.id}/${fuseSub.id}`] === true;
           const rOhm = subBlown ? R_OPEN : R_CLOSED;
           const rid = `R_FBSLOT_${n.id}_${fuseSub.id}`;
-          ctx.resistors.push({ id: rid, a: bus, b: port(slotPort.id), rOhm });
+          ctx.resistors.push({ id: rid, a: posBus, b: port(slotPort.id), rOhm });
           ctx.addPrimary(`${n.id}/${fuseSub.id}`, rid);
         } else {
-          // No fuse installed in this slot → treat as open.
           ctx.resistors.push({
             id: `R_FBSLOT_OPEN_${n.id}_${i}`,
-            a: bus,
+            a: posBus,
             b: port(slotPort.id),
             rOhm: R_OPEN,
           });
         }
       }
-      if (groundPort) {
-        // ground port is a separate ground bus passthrough — usually wired to battery -.
-        // We just expose it; user wiring connects it to common ground.
+
+      // --- Ground bus: bond MAIN GND + every gndN screw together ---
+      if (groundPorts.length > 0) {
+        const gndBus = `${n.id}/__gnd_bus__`;
+        for (const g of groundPorts) {
+          ctx.resistors.push({
+            id: `R_FB_GND_${n.id}_${g.id}`,
+            a: port(g.id),
+            b: gndBus,
+            rOhm: R_BUSBAR,
+          });
+        }
       }
       break;
     }

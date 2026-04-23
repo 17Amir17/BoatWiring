@@ -41,24 +41,27 @@ function PortPin({
   const isPower = port.role === 'source' || port.label === '+';
   const isGround = port.role === 'sink' && (port.label === '-' || port.label.toLowerCase().includes('gnd'));
   const dotColor = isPower ? '#facc15' : isGround ? '#0f172a' : '#cbd5e1';
+
+  // React Flow needs a source-type Handle to ORIGINATE an edge and a target-type
+  // Handle to TERMINATE one. For passthrough ports (fuse, switch, busbar, etc.)
+  // and even pure sources/sinks, we render BOTH handles overlaid at the same
+  // pixel so any port can be either end of any wire. Both share the same id =
+  // port.id; React Flow disambiguates by the edge's direction.
+  const handleStyle: React.CSSProperties = {
+    left: px,
+    top: py,
+    width: 11,
+    height: 11,
+    background: dotColor,
+    border: '2px solid #ffffff',
+    borderRadius: 8,
+    boxShadow: '0 0 0 1px rgba(15,23,42,0.6)',
+    transform: 'translate(-50%, -50%)',
+  };
   return (
     <>
-      <Handle
-        id={port.id}
-        type={isPower ? 'source' : 'target'}
-        position={pos}
-        style={{
-          left: px,
-          top: py,
-          width: 11,
-          height: 11,
-          background: dotColor,
-          border: '2px solid #ffffff',
-          borderRadius: 8,
-          boxShadow: '0 0 0 1px rgba(15,23,42,0.6)',
-          transform: 'translate(-50%, -50%)',
-        }}
-      />
+      <Handle id={port.id} type="source" position={pos} style={handleStyle} />
+      <Handle id={port.id} type="target" position={pos} style={{ ...handleStyle, opacity: 0 }} />
       <span
         className="absolute pointer-events-none text-[9px] font-semibold text-slate-700 select-none"
         style={{
@@ -91,9 +94,11 @@ function labelOffsetFor(pos: Position, px: number, py: number): React.CSSPropert
 const ComponentNode = ({ id, data, selected }: NodeProps<ComponentNodeType>) => {
   const def = useAppStore((s) => s.componentDefs.get(data.defId));
   const toggleSwitch = useAppStore((s) => s.toggleSwitch);
+  const toggleSubSwitch = useAppStore((s) => s.toggleSubSwitch);
   const setLoadOn = useAppStore((s) => s.setLoadOn);
   const setSelectorPosition = useAppStore((s) => s.setSelectorPosition);
   const fuseOpen = useAppStore((s) => s.engine.fuseOpen[id]);
+  const portVoltages = useAppStore((s) => s.engine.nodeVoltages);
 
   if (!def) return <div className="w-8 h-8 bg-red-500/40">missing def</div>;
 
@@ -126,7 +131,10 @@ const ComponentNode = ({ id, data, selected }: NodeProps<ComponentNodeType>) => 
         {def.name.length > 28 ? def.name.slice(0, 26) + '…' : def.name}
       </div>
 
-      {/* SVG layer: body + stub lines. Body is INSET by STUB on every side. */}
+      {/* SVG layer: body + stub lines. Body is INSET by STUB on every side.
+           pointer-events: none so the SVG doesn't swallow drags meant for React
+           Flow, but interactive children (e.g. rocker switches in CompositeBody)
+           re-enable pointer-events on themselves via inline style. */}
       <svg
         width={w}
         height={h}
@@ -155,7 +163,17 @@ const ComponentNode = ({ id, data, selected }: NodeProps<ComponentNodeType>) => 
         })}
         {/* body (inset) */}
         <g transform={`translate(${STUB}, ${STUB})`}>
-          <LookalikeBody def={def} data={data} bw={bw} bh={bh} fuseBlown={fuseOpen === true} />
+          <LookalikeBody
+            def={def}
+            data={data}
+            bw={bw}
+            bh={bh}
+            fuseBlown={fuseOpen === true}
+            onSubSwitchClick={(subId) => toggleSubSwitch(id, subId)}
+            portVoltages={Object.fromEntries(
+              def.ports.map((p) => [p.id, portVoltages[`${id}/${p.id}`] ?? 0]),
+            )}
+          />
         </g>
       </svg>
 
