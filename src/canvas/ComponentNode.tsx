@@ -99,6 +99,8 @@ const ComponentNode = ({ id, data, selected }: NodeProps<ComponentNodeType>) => 
   const setSelectorPosition = useAppStore((s) => s.setSelectorPosition);
   const fuseOpen = useAppStore((s) => s.engine.fuseOpen[id]);
   const portVoltages = useAppStore((s) => s.engine.nodeVoltages);
+  const edges = useAppStore((s) => s.edges);
+  const edgeCurrents = useAppStore((s) => s.engine.edgeCurrents);
 
   if (!def) return <div className="w-8 h-8 bg-red-500/40">missing def</div>;
 
@@ -172,6 +174,17 @@ const ComponentNode = ({ id, data, selected }: NodeProps<ComponentNodeType>) => 
             onSubSwitchClick={(subId) => toggleSubSwitch(id, subId)}
             portVoltages={Object.fromEntries(
               def.ports.map((p) => [p.id, portVoltages[`${id}/${p.id}`] ?? 0]),
+            )}
+            portCurrents={Object.fromEntries(
+              def.ports.map((p) => {
+                let net = 0;
+                for (const e of edges) {
+                  const I = edgeCurrents[e.id] ?? 0;
+                  if (e.source === id && (e.sourceHandle ?? '') === p.id) net += I;
+                  if (e.target === id && (e.targetHandle ?? '') === p.id) net -= I;
+                }
+                return [p.id, net];
+              }),
             )}
           />
         </g>

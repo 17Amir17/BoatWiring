@@ -1,0 +1,18 @@
+{
+  "id": "load-anchor-light-white",
+  "kind": "load",
+  "name": "Anchor Light (White 360°)",
+  "size": { "w": 70, "h": 70 },
+  "ports": [
+    { "id": "in",  "label": "+", "rel": { "x": 0.30, "y": 1.0 }, "role": "sink" },
+    { "id": "out", "label": "-", "rel": { "x": 0.70, "y": 1.0 }, "role": "sink" }
+  ],
+  "specs": {
+    "wattsOn": 4,
+    "vMin": 10,
+    "vMax": 30,
+    "inrushA": 0.15,
+    "chromaticity": "white"
+  },
+  "description": "12V DC all-round white masthead anchor light, visible 360°/2 nm. Required when at anchor outside designated anchorages between sunset and sunrise."
+}

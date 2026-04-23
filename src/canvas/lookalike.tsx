@@ -30,9 +30,27 @@ interface BodyProps {
   /** Voltage at each port of THIS component, keyed by port id. Used to drive
    *  live overlays like the voltmeter inside a composite panel. */
   portVoltages?: Record<string, number>;
+  /** Net current flowing OUT of each port of THIS component, keyed by port id.
+   *  Positive = leaving the component (sourcing), negative = entering (sinking). */
+  portCurrents?: Record<string, number>;
 }
 
-function BatteryBody({ bw, bh }: BodyProps) {
+function BatteryBody({ bw, bh, data, portCurrents }: BodyProps) {
+  const soc = typeof data.soc === 'number' ? Math.max(0, Math.min(1, data.soc)) : 1;
+  const iPos = portCurrents?.['pos'] ?? 0;
+  const sourcing = iPos > 0.05;
+  const charging = iPos < -0.05;
+  const ampsLabel = sourcing
+    ? `${iPos.toFixed(1)} A out`
+    : charging
+      ? `${(-iPos).toFixed(1)} A in`
+      : '0.0 A';
+  const ampsColor = sourcing ? '#dc2626' : charging ? '#16a34a' : '#475569';
+  const socColor = soc > 0.5 ? '#22c55e' : soc > 0.2 ? '#facc15' : '#ef4444';
+  const barX = bw * 0.10;
+  const barY = bh * 0.14;
+  const barW = bw * 0.80;
+  const barH = bh * 0.06;
   return (
     <g>
       {/* terminal posts on top */}
@@ -41,10 +59,18 @@ function BatteryBody({ bw, bh }: BodyProps) {
       {/* battery case */}
       <rect x="0" y={bh * 0.10} width={bw} height={bh * 0.90}
             rx="6" fill="#e2e8f0" stroke="#475569" strokeWidth="1.5" />
-      <text x={bw / 2} y={bh * 0.55} textAnchor="middle"
+      {/* SoC bar */}
+      <rect x={barX} y={barY} width={barW} height={barH}
+            rx={barH * 0.4} fill="#1f2937" stroke="#475569" strokeWidth="0.6" />
+      <rect x={barX + 1} y={barY + 1} width={Math.max(0, barW - 2) * soc} height={barH - 2}
+            rx={(barH - 2) * 0.4} fill={socColor} />
+      <text x={bw * 0.25} y={bh * 0.42} textAnchor="middle" fill="#1e293b" fontSize="10">−</text>
+      <text x={bw * 0.75} y={bh * 0.42} textAnchor="middle" fill="#dc2626" fontSize="10">+</text>
+      <text x={bw / 2} y={bh * 0.65} textAnchor="middle"
             fill="#0f172a" fontSize="11" fontWeight="600">12 V</text>
-      <text x={bw * 0.25} y={bh * 0.32} textAnchor="middle" fill="#1e293b" fontSize="10">−</text>
-      <text x={bw * 0.75} y={bh * 0.32} textAnchor="middle" fill="#dc2626" fontSize="10">+</text>
+      <text x={bw / 2} y={bh * 0.85} textAnchor="middle"
+            fill={ampsColor} fontSize="10" fontWeight="700"
+            fontFamily="ui-monospace, monospace">{ampsLabel}</text>
     </g>
   );
 }
@@ -139,9 +165,18 @@ function SelectorBody({ bw, bh, def, data }: BodyProps) {
   );
 }
 
-function LoadBody({ bw, bh, def, data, portVoltages }: BodyProps) {
+function isEnergized(def: ComponentDef, data: ComponentNodeData, portVoltages?: Record<string, number>) {
   const on = data.on !== false;
-  const tint = str(def.specs.chromaticity, 'amber');
+  const vMin = num(def.specs.vMin, 8);
+  const vIn = portVoltages?.['in'] ?? portVoltages?.['+'] ?? 0;
+  const vOut = portVoltages?.['out'] ?? portVoltages?.['-'] ?? 0;
+  const drop = Math.abs(vIn - vOut);
+  return on && drop >= vMin;
+}
+
+function GenericLoadBody({ bw, bh, def, data, portVoltages }: BodyProps) {
+  // data.chromaticity (per-node override) wins over def.specs.chromaticity.
+  const tint = str((data as { chromaticity?: unknown }).chromaticity, str(def.specs.chromaticity, 'amber'));
   const colors: Record<string, [string, string]> = {
     blue:   ['#3b82f6', '#1e3a8a'],
     red:    ['#ef4444', '#7f1d1d'],
@@ -149,32 +184,56 @@ function LoadBody({ bw, bh, def, data, portVoltages }: BodyProps) {
     white:  ['#f8fafc', '#e2e8f0'],
     amber:  ['#fbbf24', '#92400e'],
   };
-  const [bright, dim] = colors[tint] ?? colors.amber;
-  // Energized = on AND has voltage above the load's vMin
-  const vMin = num(def.specs.vMin, 8);
-  const vIn = portVoltages?.['in'] ?? portVoltages?.['+'] ?? 0;
-  const vOut = portVoltages?.['out'] ?? portVoltages?.['-'] ?? 0;
-  const drop = Math.abs(vIn - vOut);
-  const energized = on && drop >= vMin;
+  const energized = isEnergized(def, data, portVoltages);
   const r = Math.min(bw, bh) * 0.42;
+  const cx = bw / 2;
+  const cy = bh / 2;
+
+  // Bicolor port/starboard nav light: red half-disc on port (left),
+  // green half-disc on starboard (right). Glows on both halves when energized.
+  if (tint === 'redGreen') {
+    const [redB, redD] = colors.red;
+    const [grnB, grnD] = colors.green;
+    return (
+      <g>
+        <rect x="0" y="0" width={bw} height={bh}
+              rx={Math.min(bw, bh) * 0.5}
+              fill="#1e293b" stroke="#475569" strokeWidth="1.2" />
+        <path d={`M ${cx} ${cy - r} A ${r} ${r} 0 0 0 ${cx} ${cy + r} Z`}
+              fill={energized ? redB : redD}
+              filter={energized ? `drop-shadow(0 0 6px ${redB})` : undefined} />
+        <path d={`M ${cx} ${cy - r} A ${r} ${r} 0 0 1 ${cx} ${cy + r} Z`}
+              fill={energized ? grnB : grnD}
+              filter={energized ? `drop-shadow(0 0 6px ${grnB})` : undefined} />
+        <line x1={cx} y1={cy - r} x2={cx} y2={cy + r}
+              stroke="#0f172a" strokeWidth="0.8" />
+        {energized && (
+          <text x={cx} y={bh - 3} textAnchor="middle"
+                fill="#22c55e" fontSize={Math.max(7, bh * 0.15)}
+                fontWeight="700" fontFamily="ui-sans-serif, system-ui">●</text>
+        )}
+      </g>
+    );
+  }
+
+  const [bright, dim] = colors[tint] ?? colors.amber;
   return (
     <g>
       <rect x="0" y="0" width={bw} height={bh}
             rx={Math.min(bw, bh) * 0.5}
             fill="#1e293b" stroke="#475569" strokeWidth="1.2" />
-      <circle cx={bw / 2} cy={bh / 2} r={r}
+      <circle cx={cx} cy={cy} r={r}
               fill={energized ? bright : dim}
               filter={energized
                 ? `drop-shadow(0 0 8px ${bright}) drop-shadow(0 0 16px ${bright})`
                 : undefined} />
       {energized && (
         <>
-          <circle cx={bw / 2} cy={bh / 2} r={r * 0.55} fill="white" fillOpacity="0.7" />
-          <circle cx={bw / 2 - r * 0.2} cy={bh / 2 - r * 0.2} r={r * 0.18}
+          <circle cx={cx} cy={cy} r={r * 0.55} fill="white" fillOpacity="0.7" />
+          <circle cx={cx - r * 0.2} cy={cy - r * 0.2} r={r * 0.18}
                   fill="white" fillOpacity="0.95" />
         </>
       )}
-      {/* Visible "ON" badge */}
       {energized && (
         <text x={bw / 2} y={bh - 3} textAnchor="middle"
               fill="#22c55e" fontSize={Math.max(7, bh * 0.15)}
@@ -184,6 +243,213 @@ function LoadBody({ bw, bh, def, data, portVoltages }: BodyProps) {
       )}
     </g>
   );
+}
+
+function UnderwaterLedBody({ bw, bh, def, data, portVoltages }: BodyProps) {
+  const energized = isEnergized(def, data, portVoltages);
+  const cx = bw / 2;
+  const cy = bh / 2;
+  const rOuter = Math.min(bw, bh) * 0.46;
+  const rRing = rOuter * 0.86;
+  const rLens = rOuter * 0.62;
+  const rHot = rOuter * 0.18;
+  const lensFill = energized ? '#3b82f6' : '#1e3a8a';
+  return (
+    <g filter={energized ? 'drop-shadow(0 0 6px #3b82f6) drop-shadow(0 0 14px #1d4ed8)' : undefined}>
+      {/* chrome outer ring with subtle radial highlight */}
+      <circle cx={cx} cy={cy} r={rOuter} fill="#cbd5e1" stroke="#475569" strokeWidth="1.2" />
+      <circle cx={cx} cy={cy} r={rRing} fill="#94a3b8" stroke="#334155" strokeWidth="0.8" />
+      <circle cx={cx - rOuter * 0.25} cy={cy - rOuter * 0.30} r={rOuter * 0.18}
+              fill="#f1f5f9" fillOpacity="0.7" />
+      {/* domed lens */}
+      <circle cx={cx} cy={cy} r={rLens} fill={lensFill} stroke="#0f172a" strokeWidth="0.8" />
+      {/* lens highlight crescent */}
+      <ellipse cx={cx - rLens * 0.30} cy={cy - rLens * 0.32}
+               rx={rLens * 0.32} ry={rLens * 0.18}
+               fill="white" fillOpacity={energized ? 0.55 : 0.18} />
+      {/* center LED */}
+      <circle cx={cx} cy={cy} r={rHot}
+              fill={energized ? '#ffffff' : '#0f172a'}
+              opacity={energized ? 1 : 0.7} />
+      {energized && (
+        <circle cx={cx} cy={cy} r={rHot * 0.55} fill="#dbeafe" />
+      )}
+    </g>
+  );
+}
+
+function HornBody({ bw, bh, def, data, portVoltages }: BodyProps) {
+  const energized = isEnergized(def, data, portVoltages);
+  const bracketW = bw * 0.12;
+  const bracketH = bh * 0.50;
+  const bracketY = (bh - bracketH) / 2;
+  const coneX0 = bracketW;
+  const coneX1 = bw * 0.78;
+  const coneTopY0 = bh * 0.40;
+  const coneBotY0 = bh * 0.60;
+  const coneTopY1 = bh * 0.10;
+  const coneBotY1 = bh * 0.90;
+  const bellCx = bw * 0.82;
+  const bellRy = bh * 0.42;
+  const bellRx = bw * 0.06;
+  const coneFill = energized ? '#fbbf24' : '#475569';
+  const coneStroke = energized ? '#92400e' : '#1e293b';
+  const bellFill = energized ? '#fde68a' : '#334155';
+  return (
+    <g>
+      {/* mounting bracket */}
+      <rect x={0} y={bracketY} width={bracketW} height={bracketH}
+            rx="2" fill="#334155" stroke="#0f172a" strokeWidth="0.8" />
+      <circle cx={bracketW * 0.5} cy={bracketY + 3} r={1.4} fill="#0f172a" />
+      <circle cx={bracketW * 0.5} cy={bracketY + bracketH - 3} r={1.4} fill="#0f172a" />
+      {/* trumpet cone */}
+      <path
+        d={`M ${coneX0} ${coneTopY0} L ${coneX1} ${coneTopY1} L ${coneX1} ${coneBotY1} L ${coneX0} ${coneBotY0} Z`}
+        fill={coneFill}
+        stroke={coneStroke}
+        strokeWidth="1.2"
+        filter={energized ? 'drop-shadow(0 0 5px #fbbf24)' : undefined}
+      />
+      {/* bell mouth (right end) */}
+      <ellipse cx={bellCx} cy={bh / 2} rx={bellRx} ry={bellRy}
+               fill={bellFill} stroke={coneStroke} strokeWidth="1.2" />
+      <ellipse cx={bellCx + bellRx * 0.4} cy={bh / 2} rx={bellRx * 0.5} ry={bellRy * 0.7}
+               fill="#0f172a" fillOpacity="0.35" />
+      {/* sound waves */}
+      {energized && (
+        <g stroke="#f59e0b" strokeWidth="1.6" fill="none" strokeLinecap="round" opacity="0.9">
+          <path d={`M ${bw * 0.90} ${bh * 0.30} Q ${bw * 0.96} ${bh * 0.50} ${bw * 0.90} ${bh * 0.70}`} />
+          <path d={`M ${bw * 0.94} ${bh * 0.18} Q ${bw * 1.02} ${bh * 0.50} ${bw * 0.94} ${bh * 0.82}`} />
+        </g>
+      )}
+    </g>
+  );
+}
+
+function BilgePumpBody({ bw, bh, def, data, portVoltages }: BodyProps) {
+  const energized = isEnergized(def, data, portVoltages);
+  const bodyX = bw * 0.18;
+  const bodyW = bw * 0.50;
+  const bodyTopY = bh * 0.22;
+  const bodyBotY = bh * 0.78;
+  // when running, body tints teal-blue (water-cooled motor look) with a glow
+  const bodyFill = energized ? '#0e7490' : '#475569';
+  const stroke = '#0f172a';
+  const dischargeX = bodyX + bodyW * 0.65;
+  const dischargeTopY = bh * 0.04;
+  const dischargeW = bw * 0.10;
+  const outletCx = bw - 1;
+  const outletCy = dischargeTopY + dischargeW / 2;
+  const bodyCx = bodyX + bodyW / 2;
+  const bodyCy = (bodyTopY + bodyBotY) / 2;
+  const impellerR = bodyW * 0.30;
+
+  return (
+    <g>
+      {/* strainer base (slotted intake) */}
+      <rect x={bodyX - 2} y={bodyBotY} width={bodyW + 4} height={bh * 0.18}
+            rx="3" fill="#1e293b" stroke={stroke} strokeWidth="1" />
+      {Array.from({ length: 5 }).map((_, i) => {
+        const x = bodyX + (i + 0.5) * (bodyW / 5);
+        return (
+          <line key={i} x1={x} y1={bodyBotY + bh * 0.04} x2={x} y2={bodyBotY + bh * 0.14}
+                stroke="#94a3b8" strokeWidth="1" strokeLinecap="round" />
+        );
+      })}
+      {/* main cylindrical body — wraps in a vibrating <g> when running */}
+      <g
+        filter={energized ? 'drop-shadow(0 0 5px #22d3ee)' : undefined}
+      >
+        {energized && (
+          <animateTransform
+            attributeName="transform"
+            type="translate"
+            values="0,0; 0.6,0; 0,0; -0.6,0; 0,0"
+            dur="0.18s"
+            repeatCount="indefinite"
+          />
+        )}
+        <rect x={bodyX} y={bodyTopY} width={bodyW} height={bodyBotY - bodyTopY}
+              rx={bodyW * 0.18} fill={bodyFill} stroke={stroke} strokeWidth="1.2" />
+        <ellipse cx={bodyCx} cy={bodyTopY} rx={bodyW / 2} ry={bh * 0.06}
+                 fill={energized ? '#22d3ee' : '#94a3b8'} stroke={stroke} strokeWidth="1" />
+        {/* spinning impeller hint when running */}
+        {energized && (
+          <g transform={`translate(${bodyCx}, ${bodyCy})`}>
+            <circle r={impellerR} fill="#0f172a" opacity="0.55" />
+            <g>
+              <line x1={-impellerR * 0.85} y1={0} x2={impellerR * 0.85} y2={0}
+                    stroke="#67e8f9" strokeWidth="1.4" strokeLinecap="round" />
+              <line x1={0} y1={-impellerR * 0.85} x2={0} y2={impellerR * 0.85}
+                    stroke="#67e8f9" strokeWidth="1.4" strokeLinecap="round" />
+              <animateTransform
+                attributeName="transform"
+                type="rotate"
+                from="0" to="360"
+                dur="0.45s"
+                repeatCount="indefinite"
+              />
+            </g>
+          </g>
+        )}
+      </g>
+      {/* discharge stack */}
+      <rect x={dischargeX} y={bh * 0.10} width={dischargeW} height={bodyTopY - bh * 0.10 + 2}
+            fill="#94a3b8" stroke={stroke} strokeWidth="1" />
+      <rect x={dischargeX} y={dischargeTopY} width={bw - dischargeX - 1} height={dischargeW}
+            fill="#94a3b8" stroke={stroke} strokeWidth="1" />
+      <rect x={bw - 4} y={dischargeTopY} width={3} height={dischargeW} fill="#0f172a" />
+      {/* pigtail wire stub */}
+      <path
+        d={`M ${bodyX + bodyW * 0.20} ${bodyTopY} q -4 -8 -10 -10`}
+        stroke="#1e293b" strokeWidth="1.4" fill="none" strokeLinecap="round"
+      />
+      {/* water spray + animated droplets out of the discharge */}
+      {energized && (
+        <g>
+          {/* big animated arrow */}
+          <path
+            d={`M ${bw - 12} ${outletCy} l 10 -5 l 0 10 z`}
+            fill="#3b82f6" stroke="#1e3a8a" strokeWidth="0.6"
+          >
+            <animate attributeName="opacity" values="1;0.4;1" dur="0.4s" repeatCount="indefinite" />
+          </path>
+          {/* three falling droplets, staggered phase */}
+          {[
+            { x: outletCx,     r: 2.2, dur: '0.55s', begin: '0s'   },
+            { x: outletCx - 5, r: 1.8, dur: '0.55s', begin: '0.18s' },
+            { x: outletCx + 4, r: 1.5, dur: '0.55s', begin: '0.36s' },
+          ].map((d, i) => (
+            <circle key={i} cx={d.x} cy={outletCy + 4} r={d.r}
+                    fill="#3b82f6" opacity="0.85">
+              <animate attributeName="cy"
+                       values={`${outletCy + 4};${bh - 2}`}
+                       dur={d.dur} begin={d.begin} repeatCount="indefinite" />
+              <animate attributeName="opacity"
+                       values="0.95;0.95;0"
+                       dur={d.dur} begin={d.begin} repeatCount="indefinite" />
+            </circle>
+          ))}
+          {/* "RUN" badge above the body so it's unmistakably ON */}
+          <g transform={`translate(${bodyCx}, ${bh - 2})`}>
+            <rect x={-12} y={-9} width={24} height={10}
+                  rx={2} fill="#22d3ee" stroke="#0e7490" strokeWidth="0.6" />
+            <text x={0} y={-1} textAnchor="middle"
+                  fill="#0f172a" fontSize="7" fontWeight="800"
+                  fontFamily="ui-sans-serif, system-ui">RUN</text>
+          </g>
+        </g>
+      )}
+    </g>
+  );
+}
+
+function LoadBody(props: BodyProps) {
+  const id = props.def.id;
+  if (id === 'ae-underwater-led-blue-ip68-4pc') return <UnderwaterLedBody {...props} />;
+  if (id === 'load-marine-horn')                return <HornBody {...props} />;
+  if (id === 'load-bilge-pump')                 return <BilgePumpBody {...props} />;
+  return <GenericLoadBody {...props} />;
 }
 
 function ConnectorBody({ bw, bh, def }: BodyProps) {

@@ -74,13 +74,25 @@ export const BOAT_DEMO_NODES: BoatNode[] = [
     subStates: { sw1: { on: true }, sw3: { on: true } },
   }),
 
-  // --- 6 loads downstream of the 6 panel switches, spread across the canvas ---
-  node('L1', 'load-nav-led',             1900,  100, { on: true }), // Nav red+green
-  node('L2', 'load-nav-led',             1900,  280, { on: true }), // Anchor white
-  node('L3', 'transom-led-blue-4pc',     1900,  460, { on: true }), // Blue underwater LEDs ×4
-  node('L4', 'load-nav-led',             1900,  640, { on: true }), // Spreader light (proxy)
-  node('L5', 'load-nav-led',             1900,  820, { on: true }), // Fish finder (proxy)
-  node('L6', 'load-nav-led',             1900, 1000, { on: true }), // Horn (proxy)
+  // --- Loads downstream of the 6 panel switches, spread across the canvas ---
+  // SW1 → Nav lights (red port + green starboard bicolor bow light)
+  node('L1', 'load-nav-light-bicolor', 1900, 100, { on: true }),
+  // SW2 → Anchor light (white masthead, 360°)
+  node('L2', 'load-anchor-light-white', 1900, 280, { on: true }),
+  // SW3 → 4× transom courtesy light packs + 4× underwater LEDs (8 fixtures).
+  // Spacing 130px (= 80h + 50 gap) so the router's stub projection clears the
+  // next node below.
+  node('L3_T1', 'transom-led-blue-4pc', 1900, 460, { on: true }),
+  node('L3_T2', 'transom-led-blue-4pc', 1900, 590, { on: true }),
+  node('L3_T3', 'transom-led-blue-4pc', 1900, 720, { on: true }),
+  node('L3_T4', 'transom-led-blue-4pc', 1900, 850, { on: true }),
+  node('L3_U1', 'ae-underwater-led-blue-ip68-4pc', 2120, 460, { on: true }),
+  node('L3_U2', 'ae-underwater-led-blue-ip68-4pc', 2120, 590, { on: true }),
+  node('L3_U3', 'ae-underwater-led-blue-ip68-4pc', 2120, 720, { on: true }),
+  node('L3_U4', 'ae-underwater-led-blue-ip68-4pc', 2120, 850, { on: true }),
+  // SW4 → Marine horn
+  node('L4', 'load-marine-horn', 1900, 1010, { on: true }),
+  // SW5, SW6 → empty (no load wired)
 
   // --- Devices plugged into the panel's USB-A, USB-B, and cigarette outlets ---
   node('UA',  'load-usb-phone',     2200,  300, { on: true }),  // Phone on USB-A
@@ -120,23 +132,38 @@ export const BOAT_DEMO_EDGES: BoatEdge[] = [
   // --- Panel sub-switch outputs feed loads; loads return DIRECTLY to the fuse
   //     box's per-circuit GND screws (NOT through the panel — the panel's only
   //     ground pin is for its internal LED illumination + accessory bus). ---
+  // SW1 → Nav lights
   edge('e_p1_l1', 'PANEL', 'sw1+', 'L1', 'in',  W_FEED_LOAD,   6),
   edge('e_l1_g',  'L1',    'out',  'FB', 'gnd1',W_RETURN_LOAD, 6),
 
+  // SW2 → Anchor light
   edge('e_p2_l2', 'PANEL', 'sw2+', 'L2', 'in',  W_FEED_LOAD,   6),
   edge('e_l2_g',  'L2',    'out',  'FB', 'gnd2',W_RETURN_LOAD, 6),
 
-  edge('e_p3_l3', 'PANEL', 'sw3+', 'L3', 'in',  W_FEED_LOAD,   6),
-  edge('e_l3_g',  'L3',    'out',  'FB', 'gnd3',W_RETURN_LOAD, 6),
+  // SW3 → 4 transom packs + 4 underwater LEDs in parallel. Multiple edges from
+  // PANEL.sw3+ all share that handle (boat-wiring reality is a wago/splice).
+  edge('e_p3_t1', 'PANEL', 'sw3+', 'L3_T1', 'in',  W_FEED_LOAD,   8),
+  edge('e_p3_t2', 'PANEL', 'sw3+', 'L3_T2', 'in',  W_FEED_LOAD,   8),
+  edge('e_p3_t3', 'PANEL', 'sw3+', 'L3_T3', 'in',  W_FEED_LOAD,   8),
+  edge('e_p3_t4', 'PANEL', 'sw3+', 'L3_T4', 'in',  W_FEED_LOAD,   8),
+  edge('e_p3_u1', 'PANEL', 'sw3+', 'L3_U1', 'in',  W_FEED_LOAD,  10),
+  edge('e_p3_u2', 'PANEL', 'sw3+', 'L3_U2', 'in',  W_FEED_LOAD,  10),
+  edge('e_p3_u3', 'PANEL', 'sw3+', 'L3_U3', 'in',  W_FEED_LOAD,  10),
+  edge('e_p3_u4', 'PANEL', 'sw3+', 'L3_U4', 'in',  W_FEED_LOAD,  10),
+  edge('e_t1_g',  'L3_T1', 'out',  'FB',    'gnd3', W_RETURN_LOAD, 8),
+  edge('e_t2_g',  'L3_T2', 'out',  'FB',    'gnd3', W_RETURN_LOAD, 8),
+  edge('e_t3_g',  'L3_T3', 'out',  'FB',    'gnd3', W_RETURN_LOAD, 8),
+  edge('e_t4_g',  'L3_T4', 'out',  'FB',    'gnd3', W_RETURN_LOAD, 8),
+  edge('e_u1_g',  'L3_U1', 'out',  'FB',    'gnd3', W_RETURN_LOAD,10),
+  edge('e_u2_g',  'L3_U2', 'out',  'FB',    'gnd3', W_RETURN_LOAD,10),
+  edge('e_u3_g',  'L3_U3', 'out',  'FB',    'gnd3', W_RETURN_LOAD,10),
+  edge('e_u4_g',  'L3_U4', 'out',  'FB',    'gnd3', W_RETURN_LOAD,10),
 
+  // SW4 → Marine horn
   edge('e_p4_l4', 'PANEL', 'sw4+', 'L4', 'in',  W_FEED_LOAD,   6),
   edge('e_l4_g',  'L4',    'out',  'FB', 'gnd4',W_RETURN_LOAD, 6),
 
-  edge('e_p5_l5', 'PANEL', 'sw5+', 'L5', 'in',  W_FEED_LOAD,   6),
-  edge('e_l5_g',  'L5',    'out',  'FB', 'gnd5',W_RETURN_LOAD, 6),
-
-  edge('e_p6_l6', 'PANEL', 'sw6+', 'L6', 'in',  W_FEED_LOAD,   6),
-  edge('e_l6_g',  'L6',    'out',  'FB', 'gnd6',W_RETURN_LOAD, 6),
+  // SW5, SW6 → empty (no load wired downstream of the switch outputs)
 
   // --- Panel's own accessory bus (USB chargers + voltmeter + cig outlet) on
   //     fuse-box circuit 7. The panel's GND pin (= switch-LED ground) ties to

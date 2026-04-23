@@ -73,8 +73,10 @@ export function routeEdges(
 
     const sStart = pointToCell(grid, sPt.x, sPt.y);
     const tStart = pointToCell(grid, tPt.x, tPt.y);
-    const sStub = projectCells(sStart, sDir, STUB_CELLS, grid);
-    const tStub = projectCells(tStart, tDir, STUB_CELLS, grid);
+    const sN = pickStubLength(sStart, sDir, grid);
+    const tN = pickStubLength(tStart, tDir, grid);
+    const sStub = projectCells(sStart, sDir, sN, grid);
+    const tStub = projectCells(tStart, tDir, tN, grid);
 
     // A* runs between the stub-end cells, both of which sit OUTSIDE every node
     // bbox (since we projected past the port's clearance). No carve-out: the
@@ -94,13 +96,17 @@ export function routeEdges(
     // (tStub → port) so the wire visually anchors at the actual pin.
     const fullCells: Cell[] = [
       sStart,
-      ...stubCells(sStart, sDir, STUB_CELLS),
+      ...stubCells(sStart, sDir, sN),
       ...path.slice(1, -1),
-      ...stubCells(tStart, tDir, STUB_CELLS).reverse(),
+      ...stubCells(tStart, tDir, tN).reverse(),
       tStart,
     ];
 
-    for (const c of fullCells) {
+    // Only penalize the trunk (the A* portion) so future wires sharing a port
+    // can still get out via the same perpendicular stub. Without this, the 2nd
+    // wire from a shared port can't pathfind because its stub cells are heavily
+    // penalized by the 1st wire's usage entries.
+    for (const c of path) {
       const idx = c.cy * grid.cols + c.cx;
       if (idx >= 0 && idx < grid.walkable.length) {
         usage.set(idx, (usage.get(idx) ?? 0) + REUSE_PENALTY);
@@ -132,6 +138,26 @@ function projectCells(start: Cell, dir: Dir, n: number, grid: Grid): Cell {
   const cx = clamp(start.cx + dir.dx * n, 0, grid.cols - 1);
   const cy = clamp(start.cy + dir.dy * n, 0, grid.rows - 1);
   return { cx, cy };
+}
+
+/** Walk outward from `start` along `dir` until we hit a walkable cell. Prefer
+ *  STUB_CELLS, but extend further if the default lands inside a neighboring
+ *  node. Cap at `maxN` to avoid runaway. Returns 0 if we never find one. */
+function pickStubLength(start: Cell, dir: Dir, grid: Grid): number {
+  const maxN = STUB_CELLS + 8;
+  // Try the canonical length first; if blocked, walk OUT until we escape.
+  for (let n = STUB_CELLS; n <= maxN; n++) {
+    const c = projectCells(start, dir, n, grid);
+    const idx = c.cy * grid.cols + c.cx;
+    if (idx >= 0 && idx < grid.walkable.length && grid.walkable[idx] === 1) return n;
+  }
+  // Last resort: shorter than STUB_CELLS.
+  for (let n = STUB_CELLS - 1; n >= 1; n--) {
+    const c = projectCells(start, dir, n, grid);
+    const idx = c.cy * grid.cols + c.cx;
+    if (idx >= 0 && idx < grid.walkable.length && grid.walkable[idx] === 1) return n;
+  }
+  return 0;
 }
 
 function stubCells(start: Cell, dir: Dir, n: number): Cell[] {

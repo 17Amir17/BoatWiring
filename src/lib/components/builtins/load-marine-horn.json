@@ -1,0 +1,19 @@
+{
+  "id": "load-marine-horn",
+  "kind": "load",
+  "name": "Marine Horn 12V 5A",
+  "size": { "w": 90, "h": 70 },
+  "ports": [
+    { "id": "in",  "label": "+", "rel": { "x": 0.30, "y": 1.0 }, "role": "sink" },
+    { "id": "out", "label": "-", "rel": { "x": 0.70, "y": 1.0 }, "role": "sink" }
+  ],
+  "specs": {
+    "wattsOn": 60,
+    "vMin": 10,
+    "vMax": 14,
+    "inrushA": 6,
+    "soundDb": 110,
+    "chromaticity": "amber"
+  },
+  "description": "Generic 12V DC electric marine/automotive horn. ~5A continuous draw, 110dB at 1m. Used as a boat signaling horn driven by a momentary switch (held position on the rocker)."
+}

@@ -1,0 +1,18 @@
+{
+  "id": "load-nav-light-bicolor",
+  "kind": "load",
+  "name": "Nav Light (Red/Green Bow)",
+  "size": { "w": 70, "h": 70 },
+  "ports": [
+    { "id": "in",  "label": "+", "rel": { "x": 0.30, "y": 1.0 }, "role": "sink" },
+    { "id": "out", "label": "-", "rel": { "x": 0.70, "y": 1.0 }, "role": "sink" }
+  ],
+  "specs": {
+    "wattsOn": 6,
+    "vMin": 10,
+    "vMax": 30,
+    "inrushA": 0.2,
+    "chromaticity": "redGreen"
+  },
+  "description": "12V DC bicolor bow nav light. Red sector (port, 112.5°) + green sector (starboard, 112.5°), required when underway between sunset and sunrise."
+}
