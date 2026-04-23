@@ -1,0 +1,12 @@
+{
+  "drive": [
+    { "portId": "a", "source": { "kind": "voltage", "v": 12.6, "rIntOhm": 0.02 } },
+    { "portId": "b", "source": { "kind": "load", "watts": 24 } }
+  ],
+  "expect": {
+    "voltages": {
+      "a": { "min": 12.4, "max": 12.7 },
+      "b": { "min": 12.3, "max": 12.7 }
+    }
+  }
+}

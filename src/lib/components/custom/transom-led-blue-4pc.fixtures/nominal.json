@@ -1,0 +1,10 @@
+{
+  "drive": [
+    { "portId": "in",  "source": { "kind": "voltage", "v": 12.6 } },
+    { "portId": "out", "source": { "kind": "ground" } }
+  ],
+  "state": { "on": true },
+  "expect": {
+    "voltages": { "in": { "min": 12.4, "max": 12.7 } }
+  }
+}

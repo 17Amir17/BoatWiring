@@ -1,0 +1,24 @@
+{
+  "id": "ae-heat-shrink-wire-connectors-120pc",
+  "kind": "connector",
+  "name": "Heat-Shrink Wire Connectors (120pc kit, UMLIFE)",
+  "size": { "w": 28, "h": 14 },
+  "ports": [
+    { "id": "a", "label": "A", "rel": { "x": 0.05, "y": 0.5 }, "role": "passthrough" },
+    { "id": "b", "label": "B", "rel": { "x": 0.95, "y": 0.5 }, "role": "passthrough" }
+  ],
+  "specs": { "ratedA": 22, "gaugeAWG": 16, "kitCount": 120 },
+  "connectorType": "buttSplice",
+  "wireGaugeRange": [22, 10],
+  "canAttachToWireEnd": false,
+  "qtyOwned": 120,
+  "source": {
+    "platform": "aliexpress",
+    "url": "https://www.aliexpress.com/item/1005006085452232.html",
+    "sellerTitle": "120Pcs Heat Shrink Wire Connectors, Waterproof Automotive Marine Electrical Terminals Crimp Connector Ring Fork Spade Splices",
+    "seller": "UMLIFE Store",
+    "priceUSD": 6.0,
+    "images": [],
+    "fetchedAt": "2026-04-23T10:00:00.000Z"
+  }
+}

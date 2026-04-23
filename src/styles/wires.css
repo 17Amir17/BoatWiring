@@ -1,0 +1,12 @@
+@keyframes wireFlow {
+  to { stroke-dashoffset: -16; }
+}
+
+.wire-active {
+  stroke-dasharray: 6 4;
+  animation: wireFlow var(--flow-duration, 1.2s) linear infinite;
+}
+
+.wire-inactive {
+  stroke: theme('colors.wire.off');
+}

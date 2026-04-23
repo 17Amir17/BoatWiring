@@ -1,0 +1,11 @@
+{
+  "id": "fuse-atc-30a",
+  "kind": "fuse",
+  "name": "ATC Blade Fuse 30A",
+  "size": { "w": 30, "h": 18 },
+  "ports": [
+    { "id": "a", "label": "A", "rel": { "x": 0, "y": 0.5 }, "role": "passthrough" },
+    { "id": "b", "label": "B", "rel": { "x": 1, "y": 0.5 }, "role": "passthrough" }
+  ],
+  "specs": { "ratingA": 30, "formFactor": "ATC", "voltageRating": 32 }
+}

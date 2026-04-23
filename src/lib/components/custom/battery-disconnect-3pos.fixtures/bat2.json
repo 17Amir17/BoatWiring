@@ -1,0 +1,11 @@
+{
+  "drive": [
+    { "portId": "in1", "source": { "kind": "voltage", "v": 12 } },
+    { "portId": "in2", "source": { "kind": "voltage", "v": 13.5 } },
+    { "portId": "out", "source": { "kind": "load", "watts": 6 } }
+  ],
+  "state": { "selectedPosition": 2 },
+  "expect": {
+    "voltages": { "out": { "min": 13.0, "max": 14.0 } }
+  }
+}

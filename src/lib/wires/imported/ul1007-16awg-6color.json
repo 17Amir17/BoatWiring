@@ -1,0 +1,16 @@
+{
+  "id": "ae-wire-ul1007-16awg-mixed",
+  "name": "UL1007 PVC Tinned Copper 16 AWG (6 colors × 5m, Beteno)",
+  "gaugeAWG": 16,
+  "maxAmps": 22,
+  "insulationColor": "#fbbf24",
+  "source": {
+    "platform": "aliexpress",
+    "url": "https://www.aliexpress.com/item/1005009223190475.html",
+    "sellerTitle": "6 Colors Mix Kit — UL1007 Wire PVC Insulation Tinned Copper Cable 16 AWG Stranded Electrical Line PCB Wire (16AWG 6×5m)",
+    "seller": "Beteno Connect Store",
+    "priceUSD": 23.0,
+    "images": [],
+    "fetchedAt": "2026-04-23T10:00:00.000Z"
+  }
+}

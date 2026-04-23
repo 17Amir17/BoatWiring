@@ -1,0 +1,34 @@
+{
+  "id": "ae-mrbf-fuse-block-kit-40a",
+  "kind": "composite",
+  "name": "MRBF Battery Terminal Fuse Block Kit + 40A (TLZWLA)",
+  "size": { "w": 80, "h": 60 },
+  "ports": [
+    { "id": "batstud", "label": "BAT+", "rel": { "x": 0.10, "y": 0.5 }, "role": "source" },
+    { "id": "out",     "label": "OUT",  "rel": { "x": 0.90, "y": 0.5 }, "role": "source" }
+  ],
+  "specs": {
+    "ratingA": 40,
+    "voltageRating": 58,
+    "studDiameterIn": 0.3125
+  },
+  "subComponents": [
+    { "id": "f", "subKind": "fuse", "specs": { "ratingA": 40, "formFactor": "MRBF" }, "label": "40A MRBF" },
+    { "id": "stud", "subKind": "busbar", "specs": {}, "label": "Battery stud" }
+  ],
+  "internalWiring": [
+    { "a": { "external": "batstud" }, "b": { "subId": "stud", "portId": "+" } },
+    { "a": { "subId": "stud", "portId": "+" }, "b": { "subId": "f", "portId": "+" } },
+    { "a": { "subId": "f", "portId": "-" }, "b": { "external": "out" } }
+  ],
+  "qtyOwned": 1,
+  "source": {
+    "platform": "aliexpress",
+    "url": "https://www.aliexpress.com/item/1005006540166984.html",
+    "sellerTitle": "30A-300A Battery Terminal Mount MRBF Waterproof Fuse Block Kit 58V Stud 5/16\" Marine Rated Battery Fuse for Boat Truck (One way + 40A Fuse)",
+    "seller": "TLZWLA Official Store",
+    "priceUSD": 7.0,
+    "images": [],
+    "fetchedAt": "2026-04-23T10:00:00.000Z"
+  }
+}

@@ -1,0 +1,27 @@
+{
+  "id": "ae-mrbf-fuse-40a",
+  "kind": "fuse",
+  "name": "MRBF Battery Terminal Fuse 40A (Cn1074865327)",
+  "size": { "w": 50, "h": 30 },
+  "ports": [
+    { "id": "a", "label": "STUD", "rel": { "x": 0.10, "y": 0.5 }, "role": "passthrough" },
+    { "id": "b", "label": "OUT",  "rel": { "x": 0.90, "y": 0.5 }, "role": "passthrough" }
+  ],
+  "specs": {
+    "ratingA": 40,
+    "formFactor": "MRBF",
+    "voltageRating": 58,
+    "ip": "IP66",
+    "studDiameterIn": 0.3125
+  },
+  "qtyOwned": 1,
+  "source": {
+    "platform": "aliexpress",
+    "url": "https://www.aliexpress.com/item/1005009333832635.html",
+    "sellerTitle": "Battery Terminal Fuse 100A Marine Rated Battery Fuse (MRBF), 58V DC Max IP66 Waterproof Protect Circuit of Charging Piles RV Car (40A variant)",
+    "seller": "Cn1074865327gerae Store",
+    "priceUSD": 3.5,
+    "images": [],
+    "fetchedAt": "2026-04-23T10:00:00.000Z"
+  }
+}

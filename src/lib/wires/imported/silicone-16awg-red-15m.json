@@ -1,0 +1,16 @@
+{
+  "id": "ae-wire-silicone-16awg-red-15m",
+  "name": "Silicone 16 AWG Red (15m, Shunshunfa888)",
+  "gaugeAWG": 16,
+  "maxAmps": 22,
+  "insulationColor": "#dc2626",
+  "source": {
+    "platform": "aliexpress",
+    "url": "https://www.aliexpress.com/item/1005007670999760.html",
+    "sellerTitle": "10 colors Soft and Flexible Silicone Wire Spools 16 AWG Tinned Copper — Red 15m",
+    "seller": "Shunshunfa888 Store",
+    "priceUSD": 13.0,
+    "images": [],
+    "fetchedAt": "2026-04-23T10:00:00.000Z"
+  }
+}
